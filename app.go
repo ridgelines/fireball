@@ -38,6 +38,7 @@ func (a *App) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	c := &Context{
 		PathVariables: match.Variables,
+		request:       r,
 	}
 
 	output, err := match.Handler(c)

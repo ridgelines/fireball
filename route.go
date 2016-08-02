@@ -8,9 +8,11 @@ import (
 type Handler func(c *Context) (interface{}, error)
 
 type Route struct {
-	Path string
-	Get  Handler
-	Post Handler
+	Path   string
+	Delete Handler
+	Get    Handler
+	Post   Handler
+	Put    Handler
 }
 
 // todo: return Handler+Variables
@@ -22,10 +24,14 @@ func (r *Route) Match(req *http.Request) *Match {
 
 	var handler Handler
 	switch req.Method {
+	case "DELETE":
+		handler = r.Delete
 	case "GET":
 		handler = r.Get
 	case "POST":
 		handler = r.Post
+	case "PUT":
+		handler = r.Put
 	}
 
 	if handler == nil {
@@ -42,6 +48,7 @@ func (r *Route) Match(req *http.Request) *Match {
 }
 
 func (r *Route) matchPath(url string) (map[string]string, bool) {
+	url = strings.TrimSuffix(url, "/")
 	pathSections := strings.Split(r.Path, "/")
 	urlSections := strings.Split(url, "/")
 
@@ -49,7 +56,6 @@ func (r *Route) matchPath(url string) (map[string]string, bool) {
 		return nil, false
 	}
 
-	// todo: special case on trailing /
 	variables := map[string]string{}
 	for i, pathSection := range pathSections {
 		urlSection := urlSections[i]
@@ -63,5 +69,4 @@ func (r *Route) matchPath(url string) (map[string]string, bool) {
 	}
 
 	return variables, true
-
 }
