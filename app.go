@@ -7,6 +7,7 @@ import (
 )
 
 type App struct {
+	Parser TemplateParser
 	Routes []*Route
 	// todo: Before Handler
 	// todo: After Handler
@@ -16,9 +17,15 @@ type App struct {
 }
 
 func NewApp() *App {
+	parser := &GlobParser{
+		Root: "views/",
+		Glob: "*.html",
+	}
+
 	return &App{
 		Error:    HandleError,
 		NotFound: http.NotFound,
+		Parser:   parser,
 	}
 }
 
@@ -38,6 +45,7 @@ func (a *App) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	c := &Context{
 		PathVariables: match.Variables,
+		Parser:        a.Parser,
 		request:       r,
 	}
 
@@ -47,22 +55,50 @@ func (a *App) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if ok := tryWriteHeader(w, output); !ok {
+	if ok := TryWriteHeader(w, output); !ok {
 		w.WriteHeader(http.StatusOK)
 	}
 
-	if ok := tryWriteResponse(w, output); !ok {
+	if ok := TryWriteResponse(w, output); !ok {
 		data := fmt.Sprintf("%v", output)
 		w.Write([]byte(data))
 	}
 }
 
 func HandleError(w http.ResponseWriter, err error) {
-	if ok := tryWriteHeader(w, err); !ok {
+	if ok := TryWriteHeader(w, err); !ok {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 
-	if ok := tryWriteResponse(w, err); !ok {
+	if ok := TryWriteResponse(w, err); !ok {
 		w.Write([]byte(err.Error()))
 	}
+}
+
+func TryWriteHeader(w http.ResponseWriter, obj interface{}) bool {
+	var didWrite bool
+
+	if obj, ok := obj.(Headers); ok {
+		for key, val := range obj.Headers() {
+			w.Header().Set(key, val)
+		}
+
+		didWrite = true
+	}
+
+	if obj, ok := obj.(Status); ok {
+		w.WriteHeader(obj.Status())
+		didWrite = true
+	}
+
+	return didWrite
+}
+
+func TryWriteResponse(w http.ResponseWriter, obj interface{}) bool {
+	if obj, ok := obj.(Body); ok {
+		w.Write(obj.Body())
+		return true
+	}
+
+	return false
 }

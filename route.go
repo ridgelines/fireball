@@ -15,7 +15,6 @@ type Route struct {
 	Put    Handler
 }
 
-// todo: return Handler+Variables
 func (r *Route) Match(req *http.Request) *Match {
 	variables, ok := r.matchPath(req.URL.Path)
 	if !ok {

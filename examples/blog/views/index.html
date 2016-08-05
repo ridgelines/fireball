@@ -1,9 +1,10 @@
 <h1>Hello, World!</h1>
 
 <p>My context is "{{ . }}"</p>
-{{ template "test/index.html" . }}
+
+<p>Rendering test/index: {{ template "test/index.html" . }}</p>
 
 {{ template "my_footer" "test123" }}
 
-{{ template "_footer.html" . }}
+{{ template "my_footer" . }}
 

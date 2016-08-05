@@ -5,29 +5,38 @@ import (
 )
 
 type HTTPError struct {
-	StatusCode int
-	Err        error
+	*HTTPResponse
+	Err error
+}
+
+func NewHTTPError(status int, err error) *HTTPError {
+	return &HTTPError{
+		HTTPResponse: &HTTPResponse{
+			status: status,
+		},
+		Err: err,
+	}
 }
 
 func (e *HTTPError) Error() string {
 	return e.Err.Error()
 }
 
-func (e *HTTPError) Status() int {
-	return e.StatusCode
-}
-
-func (e *HTTPError) Response() []byte {
+func (e *HTTPError) Body() []byte {
 	return []byte(e.Err.Error())
 }
-
-// todo: HTMLError
 
 type JSONError struct {
 	*HTTPError
 }
 
-func (e *JSONError) Response() []byte {
+func NewJSONError(status int, err error) *JSONError {
+	return &JSONError{
+		HTTPError: NewHTTPError(status, err),
+	}
+}
+
+func (e *JSONError) Body() []byte {
 	s := struct {
 		Error string
 	}{
