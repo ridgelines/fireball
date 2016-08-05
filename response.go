@@ -12,9 +12,14 @@ type Response interface {
 	Response() []byte
 }
 
+type Header interface {
+	Header() map[string]string
+}
+
 type HTTPResponse struct {
 	Data       []byte
 	StatusCode int
+	Headers    map[string]string
 }
 
 func (r *HTTPResponse) Status() int {
@@ -23,6 +28,10 @@ func (r *HTTPResponse) Status() int {
 
 func (r *HTTPResponse) Response() []byte {
 	return r.Data
+}
+
+func (r *HTTPResponse) Header() map[string]string {
+	return r.Headers
 }
 
 type HTMLResponse struct {
@@ -34,12 +43,22 @@ type JSONResponse struct {
 }
 
 func tryWriteHeader(w http.ResponseWriter, obj interface{}) bool {
-	if obj, ok := obj.(Status); ok {
-		w.WriteHeader(obj.Status())
-		return true
+	var didWrite bool
+
+	if obj, ok := obj.(Header); ok {
+		for key, val := range obj.Header() {
+			w.Header().Set(key, val)
+		}
+
+		didWrite = true
 	}
 
-	return false
+	if obj, ok := obj.(Status); ok {
+		w.WriteHeader(obj.Status())
+		didWrite = true
+	}
+
+	return didWrite
 }
 
 func tryWriteResponse(w http.ResponseWriter, obj interface{}) bool {

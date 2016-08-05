@@ -48,7 +48,10 @@ func (r *Route) Match(req *http.Request) *Match {
 }
 
 func (r *Route) matchPath(url string) (map[string]string, bool) {
-	url = strings.TrimSuffix(url, "/")
+	if url != "/" {
+		url = strings.TrimSuffix(url, "/")
+	}
+
 	pathSections := strings.Split(r.Path, "/")
 	urlSections := strings.Split(url, "/")
 
