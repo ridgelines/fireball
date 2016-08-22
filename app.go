@@ -29,6 +29,14 @@ func NewApp() *App {
 	}
 }
 
+func (a *App) StaticRoute(url, dir string) {
+	//fs := http.FileServer(http.Dir("/home/bob/static"))
+	//http.Handle("/static", http.StripPrefix("/static", fs))
+
+	fs := http.FileServer(http.Dir(dir))
+	http.Handle(url, fs)
+}
+
 func (a *App) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var match *Match
 	for _, route := range a.Routes {

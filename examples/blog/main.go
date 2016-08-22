@@ -11,6 +11,9 @@ func main() {
 	rootHandler := handlers.NewRootHandler()
 
 	app := fireball.NewApp()
+	app.StaticRoute("/static", "/static")
+	app.Static
+	router.Handle("/static", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	// todo: app.Before = HTTPAuth()
 
 	app.Routes = append(app.Routes, rootHandler.Routes()...)
