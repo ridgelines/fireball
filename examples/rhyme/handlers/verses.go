@@ -1,31 +1,153 @@
 package handlers
 
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"strings"
+	"sync"
+)
+
+const BATCH_SIZE = 100
+
 type Song struct {
-	Title  string
-	Artist string
-	Verses []string
+	Title     string
+	Artist    string
+	Link      string
+	RawLyrics []string
+	Lines     []*Line
 }
 
-var Songs = []Song{
-	Song{
+type Line struct {
+	Song    *Song
+	Value   string
+	Matches []*Line
+}
+
+func Init() {
+	var count int
+	for _, song := range Songs {
+		count += len(song.RawLyrics)
+	}
+
+	getMatches := func(wg *sync.WaitGroup, song *Song, line string) {
+		defer wg.Done()
+
+		matches, err := findLineMatches(line)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		newLine := &Line{
+			Song:    song,
+			Value:   line,
+			Matches: matches,
+		}
+
+		song.Lines = append(song.Lines, newLine)
+	}
+
+	var i int
+	var wg sync.WaitGroup
+	for _, song := range Songs {
+		for _, line := range song.RawLyrics {
+			wg.Add(1)
+			go getMatches(&wg, song, line)
+			i++
+
+			if i%BATCH_SIZE == 0 {
+				fmt.Printf("Waiting for batch to complete (%d/%d) \n", i, count)
+				wg.Wait()
+			}
+		}
+	}
+
+	fmt.Printf("Waiting for batch to complete (%d/%d) \n", i, count)
+	wg.Wait()
+
+	fmt.Println("Done")
+}
+
+func findLineMatches(currentLine string) ([]*Line, error) {
+	rhymes, err := getRhymes(getLastWord(currentLine))
+	if err != nil {
+		return nil, err
+	}
+
+	matches := []*Line{}
+	for _, song := range Songs {
+		for _, line := range song.Lines {
+			lastWord := strings.ToLower(getLastWord(line.Value))
+
+			for _, word := range rhymes {
+				if strings.ToLower(word.Value) == lastWord {
+					matches = append(matches, line)
+				}
+			}
+		}
+	}
+
+	return matches, nil
+}
+
+type Word struct {
+	Value string `json:"Word"`
+	Score int
+}
+
+func getLastWord(line string) string {
+	split := strings.Split(line, " ")
+	return split[len(split)-1]
+}
+
+func getRhymes(word string) ([]Word, error) {
+	url := fmt.Sprintf("http://rhymebrain.com/talk?function=getRhymes&word=%s", word)
+
+	r, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer r.Body.Close()
+
+	var words []Word
+	if err := json.NewDecoder(r.Body).Decode(&words); err != nil {
+		return nil, err
+	}
+
+	// 300 is perfect match
+	for i := 0; i < len(words); i++ {
+		if words[i].Score < 250 {
+			words = append(words[:i], words[i+1:]...)
+			i--
+		}
+	}
+
+	return words, nil
+}
+
+var Songs = []*Song{
+	&Song{
 		Title:  "Nuthing but a G Thang",
 		Artist: "Dr. DRE feat. Snoop Dogg",
-		Verses: []string{
-			"One, two, three and to the fo",
-			"Snoop Doggy Dogg and Dr. Dre is at the do",
+		Link:   "http://genius.com/Dr-dre-nuthin-but-a-g-thang-lyrics",
+		Lines:  []*Line{},
+		RawLyrics: []string{
+			"One, two, three and to the four",
+			"Snoop Doggy Dogg and Dr. Dre is at the door",
 			"Ready to make an entrance, so back on up",
-			"(Cause you know we 'bout had to rip shit up)",
+			"Cause you know we 'bout had to rip shit up",
 			"Gimme the microphone first, so I can bust like a bubble",
 			"Compton and Long Beach together, now you know you in trouble",
 			"Ain't nothin' but a G thang, baby",
 			"Two loc'ed out G's so we're crazy",
 			"Death Row is the label that pays me",
-			"Unfadable, so please don't try to fade this (Hell yeah)",
+			"Unfadable, so please don't try to fade this",
 			"But, uh, back to the lecture at hand",
 			"Perfection is perfected, so I'm 'a let 'em understand",
 			"From a young G's perspective",
 			"And before me dig out a bitch I have ta' find a contraceptive",
-			"You never know she could be earnin' her man,",
+			"You never know she could be earnin' her man",
 			"And learnin' her man, and at the same time burnin' her man",
 			"Now you know I ain't wit that shit, Lieutenant",
 			"Ain't no pussy good enough to get burnt while I'm up in it",
@@ -33,8 +155,8 @@ var Songs = []Song{
 			"And now you hookas and ho's know how I feel",
 			"Well if it's good enough to get broke off a proper chunk",
 			"I'll take a small piece of some of that funky stuff",
-			"Well I'm peepin', and I'm creepin', and I'm creep-in",
-			"But I damn near got caught, 'cause my beeper kept beepin",
+			"Well I'm peepin', and I'm creepin', and I'm creeping",
+			"But I damn near got caught, 'cause my beeper kept beeping",
 			"Now it's time for me to make my impression felt",
 			"So sit back, relax, and strap on your seat belt",
 			"You never been on a ride like this before",
@@ -52,10 +174,10 @@ var Songs = []Song{
 			"Showin' much flex when it's time to wreck a mic",
 			"Pimpin' ho's and clockin' a grip like my name was Dolomite",
 			"I think they in a mood for some motherfucking G shit",
-			"So Dre. (What up Dogg?)",
-			"We gotta give 'em what they want (What's that, G?)",
-			"We gotta break 'em off somethin' (Hell yeah)",
-			"And it's gotta be bumpin' (City of Compton)",
+			"So Dre. What up Dogg",
+			"We gotta give 'em what they want",
+			"We gotta break 'em off something",
+			"And it's gotta be bumpin' City of Compton",
 			"It's where it takes place so I'm a ask your attention",
 			"Mobbing like a motherfucker but I ain't lynching",
 			"Droppin' the funky shit that's making the sucker niggas mumble",
@@ -74,10 +196,12 @@ var Songs = []Song{
 			"Like my nigga D.O.C., no one can do it better",
 		},
 	},
-	Song{
-		Title:  "Nuthing but a G Thang",
-		Artist: "Dr. DRE feat. Snoop Dogg",
-		Verses: []string{
+	&Song{
+		Title:  "Juicy",
+		Artist: "The Notorious B.I.G.",
+		Link:   "http://genius.com/The-notorious-big-juicy-lyrics",
+		Lines:  []*Line{},
+		RawLyrics: []string{
 			"It was all a dream, I used to read Word Up magazine",
 			"Salt-n-Pepa and Heavy D up in the limousine",
 			"Hangin' pictures on my wall",
@@ -144,10 +268,12 @@ var Songs = []Song{
 			"And if you don't know, now you know, nigga",
 		},
 	},
-	Song{
+	&Song{
 		Title:  "Straight Outta Compton",
 		Artist: "N.W.A.",
-		Verses: []string{
+		Link:   "http://genius.com/Nwa-straight-outta-compton-lyrics",
+		Lines:  []*Line{},
+		RawLyrics: []string{
 			"Straight outta Compton, crazy motherfucker named Ice Cube",
 			"From the gang called Niggas Wit Attitudes",
 			"When I'm called off, I got a sawed-off",
@@ -232,104 +358,12 @@ var Songs = []Song{
 			"Word to the motherfucker, straight outta Compton",
 		},
 	},
-	Song{
+	&Song{
 		Title:  "C.R.E.A.M.",
 		Artist: "Wu-Tang Clan",
-		Verses: []string{
-			"Fuck the police coming straight from the underground",
-			"A young nigga got it bad cause I'm brown",
-			"And not the other color so police think",
-			"They have the authority to kill a minority",
-			"Fuck that shit, cause I ain't the one",
-			"For a punk motherfucker with a badge and a gun",
-			"To be beating on, and thrown in jail",
-			"We can go toe to toe in the middle of a cell",
-			"Fucking with me cause I'm a teenager",
-			"With a little bit of gold and a pager",
-			"Searching my car, looking for the product",
-			"Thinking every nigga is selling narcotics",
-			"You'd rather see, me in the pen",
-			"Than me and Lorenzo rolling in a Benz-o",
-			"Beat a police out of shape",
-			"And when I'm finished, bring the yellow tape",
-			"To tape off the scene of the slaughter",
-			"Still getting swoll off bread and water",
-			"I don't know if they fags or what",
-			"Search a nigga down, and grabbing his nuts",
-			"And on the other hand, without a gun they can't get none",
-			"But don't let it be a black and a white one",
-			"Cause they'll slam ya down to the street top",
-			"Black police showing out for the white cop",
-			"Ice Cube will swarm",
-			"On any motherfucker in a blue uniform",
-			"Just cause I'm from the CPT",
-			"Punk police are afraid of me, huh",
-			"A young nigga on the warpath",
-			"And when I'm finished, it's gonna be a bloodbath",
-			"Of cops, dying in L.A",
-			"Yo Dre, I got something to say",
-			"Fuck the police and Ren said it with authority",
-			"Because the niggas on the street is a majority",
-			"A gang is with whoever I'm stepping",
-			"And the motherfucking weapon is kept in",
-			"A stash box, for the so-called law",
-			"Wishing Ren was a nigga that they never saw",
-			"Lights start flashing behind me",
-			"But they're scared of a nigga so they mace me to blind me",
-			"But that shit don't work, I just laugh",
-			"Because it gives them a hint not to step in my path",
-			"For police, I'm saying, Fuck you punk",
-			"Reading my rights and shit, it's all junk",
-			"Pulling out a silly club, so you stand",
-			"With a fake-ass badge and a gun in your hand",
-			"But take off the gun so you can see what's up",
-			"And we'll go at it punk, and I'ma fuck you up!",
-			"Make you think I'mma kick your ass",
-			"But drop your gat, and Ren's gonna blast",
-			"I'm sneaky as fuck when it comes to crime",
-			"But I'ma smoke them now and not next time",
-			"Smoke any motherfucker that sweats me",
-			"Or any asshole that threatens me",
-			"I'm a sniper with a hell of a scope",
-			"Taking out a cop or two, they can't cope with me",
-			"The motherfucking villain that's mad",
-			"With potential, to get bad as fuck",
-			"So I'ma turn it around",
-			"Put in my clip, yo, and this is the sound",
-			"Yeah, something like that",
-			"But it all depends on the size of the gat",
-			"Taking out a police would make my day",
-			"But a nigga like Ren don't give a fuck to say",
-			"I'm tired of the motherfucking jacking",
-			"Sweating my gang, while I'm chilling in the shack, and",
-			"Shining the light in my face, and for what?",
-			"Maybe it's because I kick so much butt",
-			"I kick ass -- or maybe cause I blast",
-			"On a stupid-ass nigga when I'm playing with the trigger",
-			"Of an Uzi or an AK",
-			"Cause the police always got something stupid to say",
-			"They put out my picture with silence",
-			"Cause my identity by itself causes violence",
-			"The E with the criminal behavior",
-			"Yeah, I'm a gangsta, but still I got flavor",
-			"Without a gun and a badge, what do ya got?",
-			"A sucker in a uniform waiting to get shot",
-			"By me, or another nigga",
-			"And with a gat it don't matter if he's smaller or bigger",
-			"(MC Ren: Size don't mean shit, he's from the old school fool)",
-			"And as you all know, E's here to rule",
-			"Whenever I'm rolling, keep looking in the mirror",
-			"And ears on cue, yo, so I can hear a",
-			"Dumb motherfucker with a gun",
-			"And if I'm rolling off the 8, he'll be the one",
-			"That I take out, and then get away",
-			"While I'm driving off laughing this is what I'll say",
-		},
-	},
-	Song{
-		Title:  "C.R.E.A.M.",
-		Artist: "Wu-Tang Clan",
-		Verses: []string{
+		Link:   "http://genius.com/Wu-tang-clan-cream-lyrics",
+		Lines:  []*Line{},
+		RawLyrics: []string{
 			"I grew up on the crime side, the New York Times side",
 			"Staying alive was no jive",
 			"Had secondhands, Mom's bounced on old man",
@@ -393,10 +427,12 @@ var Songs = []Song{
 			"You gotta get over - straight up and down",
 		},
 	},
-	Song{
+	&Song{
 		Title:  "Big Pimpin'",
 		Artist: "Jay Z",
-		Verses: []string{
+		Link:   "http://genius.com/Jay-z-big-pimpin-lyrics",
+		Lines:  []*Line{},
+		RawLyrics: []string{
 			"You know I thug 'em, fuck 'em, love 'em, leave them",
 			"'Cause I don't fucking need them",
 			"Take 'em out the hood, keep 'em looking good",
@@ -478,10 +514,12 @@ var Songs = []Song{
 			"Laughing it up, Jigga Man: that's what's up",
 		},
 	},
-	Song{
+	&Song{
 		Title:  "99 Problems",
 		Artist: "Jay Z",
-		Verses: []string{
+		Link:   "http://genius.com/Jay-z-99-problems-lyrics",
+		Lines:  []*Line{},
+		RawLyrics: []string{
 			"I've got the Rap Patrol on the gat patrol",
 			"Foes that wanna make sure my casket's closed",
 			"Rap critics that say he's Money, Cash, Hoes",
@@ -547,10 +585,12 @@ var Songs = []Song{
 			"I got 99 problems, but a bitch ain't one; hit me!",
 		},
 	},
-	Song{
+	&Song{
 		Title:  "Dear Momma",
 		Artist: "2Pac",
-		Verses: []string{
+		Link:   "http://genius.com/2pac-dear-mama-lyrics",
+		Lines:  []*Line{},
+		RawLyrics: []string{
 			"When I was young, me and my mama had beef",
 			"17 years old, kicked out on the streets",
 			"Though back at the time I never thought I'd see her face",
@@ -623,10 +663,12 @@ var Songs = []Song{
 			"Is to show you that I understand; you are appreciated",
 		},
 	},
-	Song{
+	&Song{
 		Title:  "California Love",
 		Artist: "2Pac",
-		Verses: []string{
+		Link:   "http://genius.com/2pac-california-love-lyrics",
+		Lines:  []*Line{},
+		RawLyrics: []string{
 			"California... knows how to party",
 			"California... knows how to party",
 			"In the citaaay of L.A.",
@@ -673,10 +715,12 @@ var Songs = []Song{
 			"Cause you and I know it's tha best side",
 		},
 	},
-	Song{
+	&Song{
 		Title:  "In Da Club",
 		Artist: "50 Cent",
-		Verses: []string{
+		Link:   "http://genius.com/50-cent-in-da-club-lyrics",
+		Lines:  []*Line{},
+		RawLyrics: []string{
 			"Go shorty, it's your birthday",
 			"We gonna party like it's your birthday",
 			"We gonna sip Bacardi like it's your birthday",
@@ -725,10 +769,12 @@ var Songs = []Song{
 			"They know where we fucking be",
 		},
 	},
-	Song{
+	&Song{
 		Title:  "Lose Yourself",
 		Artist: "Eminem",
-		Verses: []string{
+		Link:   "http://genius.com/Eminem-lose-yourself-lyrics",
+		Lines:  []*Line{},
+		RawLyrics: []string{
 			"His palms are sweaty, knees weak, arms are heavy",
 			"There's vomit on his sweater already: Mom's spaghetti",
 			"He's nervous, but on the surface he looks calm and ready",
@@ -794,10 +840,12 @@ var Songs = []Song{
 			"This may be the only opportunity that I got",
 		},
 	},
-	Song{
+	&Song{
 		Title:  "It Was A Good Day",
 		Artist: "Ice Cube",
-		Verses: []string{
+		Link:   "http://genius.com/Ice-cube-it-was-a-good-day-lyrics",
+		Lines:  []*Line{},
+		RawLyrics: []string{
 			"Just wakin up in the mornin gotta thank God",
 			"I don't know but today seems kinda odd",
 			"No barkin from the dog, no smog",

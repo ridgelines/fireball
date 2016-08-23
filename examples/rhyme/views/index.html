@@ -28,7 +28,7 @@
 					<section id="banner">
 						<div class="inner">
 							<h2>Verse Generator</h2>
-							<p>{{ range .Lines }} {{ . }}<br />{{ end }}</p>
+							<p>{{ range .Lines }} <a href="{{ .Song.Link }}">{{ .Value }}</a><br />{{ end }}</p>
 							<ul class="actions">
 								<li><a class="button special" onClick="history.go(0)" >Generate New Verse</a></li>
 
