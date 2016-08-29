@@ -28,7 +28,10 @@
 					<section id="banner">
 						<div class="inner">
 							<h2>Verse Generator</h2>
-							<p>{{ range .Lines }} <a href="{{ .Song.Link }}">{{ .Value }}</a><br />{{ end }}</p>
+							<ul style="list-style: none;">
+							{{ range .Lines }} <li><a href="{{ .Song.Link }}">{{ .Value }}</a></li>{{ end }}
+							</ul>
+
 							<ul class="actions">
 								<li><a class="button special" onClick="history.go(0)" >Generate New Verse</a></li>
 
@@ -42,9 +45,8 @@
 						<div class="inner">
 							<header>
 								<h2>How It Works</h2>
-								<p>The Rhyme Generator takes random lines from <a href="http://www.billboard.com/articles/list/5923200/hot-rap-songs-chart-25th-anniversary-top-100-songs">Rolling Stone's Top 100 Rap Songs</a> and matches them 
-								up with lines from other songs in the list. Matches are made when the last word in one line rhymes 
-								with the last word in another.</p>
+								<p>The Verse Generator takes random lines from <a href="http://www.billboard.com/articles/list/5923200/hot-rap-songs-chart-25th-anniversary-top-100-songs">Rolling Stone's Top 100 Rap Songs</a> and matches them 
+								up with lines from other songs in the list. Lyrics provided by <a href="http://genius.com">Genius</a>.</p>
 							</header>
 						</div>
 					</section>
