@@ -7,10 +7,9 @@ import (
 )
 
 type App struct {
-	Parser TemplateParser
-	Routes []*Route
-	// todo: Before Handler
-	// todo: After Handler
+	Parser   TemplateParser
+	Routes   []*Route
+	Router   Router
 	Error    func(http.ResponseWriter, error)
 	NotFound func(http.ResponseWriter, *http.Request)
 	once     sync.Once
@@ -25,22 +24,21 @@ func NewApp() *App {
 	return &App{
 		Error:    HandleError,
 		NotFound: http.NotFound,
+		Router:   NewBasicRouter(),
 		Parser:   parser,
 	}
 }
 
-func (a *App) StaticRoute(url, dir string) {
-	//fs := http.FileServer(http.Dir("/home/bob/static"))
-	//http.Handle("/static", http.StripPrefix("/static", fs))
-
-	fs := http.FileServer(http.Dir(dir))
-	http.Handle(url, fs)
-}
-
 func (a *App) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var match *Match
+	var match *RouteMatch
 	for _, route := range a.Routes {
-		if m := route.Match(r); m != nil {
+		m, err := a.Router.Match(route, r)
+		if err != nil {
+			a.Error(w, err)
+			return
+		}
+
+		if m != nil {
 			match = m
 			break
 		}
@@ -52,7 +50,7 @@ func (a *App) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	c := &Context{
-		PathVariables: match.Variables,
+		PathVariables: match.PathVariables,
 		Parser:        a.Parser,
 		request:       r,
 	}

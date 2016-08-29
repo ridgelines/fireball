@@ -9,12 +9,10 @@ type HTTPError struct {
 	Err error
 }
 
-func NewHTTPError(status int, err error) *HTTPError {
+func NewHTTPError(status int, err error, headers map[string]string) *HTTPError {
 	return &HTTPError{
-		HTTPResponse: &HTTPResponse{
-			status: status,
-		},
-		Err: err,
+		HTTPResponse: NewHTTPResponse(status, nil, headers),
+		Err:          err,
 	}
 }
 
@@ -30,9 +28,9 @@ type JSONError struct {
 	*HTTPError
 }
 
-func NewJSONError(status int, err error) *JSONError {
+func NewJSONError(status int, err error, headers map[string]string) *JSONError {
 	return &JSONError{
-		HTTPError: NewHTTPError(status, err),
+		HTTPError: NewHTTPError(status, err, headers),
 	}
 }
 

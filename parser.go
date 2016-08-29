@@ -15,7 +15,6 @@ type TemplateParser interface {
 type GlobParser struct {
 	Root string
 	Glob string
-	// Layout, etc
 }
 
 func (p *GlobParser) Parse() (*template.Template, error) {

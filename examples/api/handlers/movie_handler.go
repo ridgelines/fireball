@@ -22,13 +22,17 @@ func (h *MovieHandler) Routes() []*fireball.Route {
 	routes := []*fireball.Route{
 		&fireball.Route{
 			Path: "/movies",
-			Get:  h.ListMovies,
-			Post: h.CreateMovie,
+			Handlers: map[string]fireball.Handler{
+				"GET":  h.ListMovies,
+				"POST": addAuth(h.CreateMovie),
+			},
 		},
 		&fireball.Route{
-			Path:   "/movies/{id}",
-			Get:    h.GetMovie,
-			Delete: h.DeleteMovie,
+			Path: "/movies/{id}",
+			Handlers: map[string]fireball.Handler{
+				"GET":    addAuth(h.GetMovie),
+				"DELETE": addAuth(h.DeleteMovie),
+			},
 		},
 	}
 

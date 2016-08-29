@@ -10,12 +10,11 @@ import (
 )
 
 func main() {
-	file := container.NewFileContainer("movies.json", nil)
+	file := container.NewStringFileContainer("movies.json", nil)
 	movieStore := stores.NewMovieStore(file)
 	movieHandler := handlers.NewMovieHandler(movieStore)
 
 	app := fireball.NewApp()
-	// todo: app.Before = HTTPAuth()
 
 	app.Routes = append(app.Routes, movieHandler.Routes()...)
 
