@@ -3,20 +3,22 @@ package main
 import (
 	"fmt"
 	"github.com/zpatrick/fireball"
-	"github.com/zpatrick/fireball/examples/blog/handlers"
 	"net/http"
 )
 
 func main() {
-	rootHandler := handlers.NewRootHandler()
+	routes := []*fireball.Route{
+		&fireball.Route{
+			Path: "/",
+			Handlers: map[string]fireball.Handler{
+				"GET": func(c *fireball.Context) (interface{}, error) {
+					return "Hello, World!", nil
+				},
+			},
+		},
+	}
 
-	app := fireball.NewApp()
-	app.StaticRoute("/static", "/static")
-	app.Static
-	router.Handle("/static", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
-	// todo: app.Before = HTTPAuth()
-
-	app.Routes = append(app.Routes, rootHandler.Routes()...)
+	app := fireball.NewApp(routes)
 
 	fmt.Println("Running on port 8000")
 	http.ListenAndServe(":8000", app)

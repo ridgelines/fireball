@@ -8,14 +8,13 @@ import (
 
 type App struct {
 	Parser   TemplateParser
-	Routes   []*Route
 	Router   Router
 	Error    func(http.ResponseWriter, error)
 	NotFound func(http.ResponseWriter, *http.Request)
 	once     sync.Once
 }
 
-func NewApp() *App {
+func NewApp(routes []*Route) *App {
 	parser := &GlobParser{
 		Root: "views/",
 		Glob: "*.html",
@@ -24,24 +23,16 @@ func NewApp() *App {
 	return &App{
 		Error:    HandleError,
 		NotFound: http.NotFound,
-		Router:   NewBasicRouter(),
+		Router:   NewBasicRouter(routes),
 		Parser:   parser,
 	}
 }
 
 func (a *App) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var match *RouteMatch
-	for _, route := range a.Routes {
-		m, err := a.Router.Match(route, r)
-		if err != nil {
-			a.Error(w, err)
-			return
-		}
-
-		if m != nil {
-			match = m
-			break
-		}
+	match, err := a.Router.Match(r)
+	if err != nil {
+		a.Error(w, err)
+		return
 	}
 
 	if match == nil {

@@ -26,5 +26,5 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static", fs))
 
 	log.Printf("Serving on port %s\n", *port)
-	log.Fatal(http.ListenAndServe(":"+*port, nil))
+	http.ListenAndServe(":"+*port, nil)
 }

@@ -30,6 +30,20 @@ func NewHTTPResponse(status int, body []byte, headers map[string]string) *HTTPRe
 	}
 }
 
+func NewJSONResponse(status int, data interface{}, headers map[string]string) (*HTTPResponse, error) {
+	if headers == nil {
+		headers = JSONHeaders
+	}
+
+	bytes, err := json.Marshal(data)
+	if err != nil {
+		return nil, err
+	}
+
+	response := NewHTTPResponse(status, bytes, headers)
+	return response, nil
+}
+
 func (r *HTTPResponse) Status() int {
 	return r.status
 }

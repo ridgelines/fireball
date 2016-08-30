@@ -22,7 +22,7 @@ func (h *RootHandler) Routes() []*fireball.Route {
 	return routes
 }
 
-type Context struct {
+type Data struct {
 	Lines []*Line
 }
 
@@ -47,9 +47,9 @@ func (h *RootHandler) Index(c *fireball.Context) (interface{}, error) {
 		}
 	}
 
-	context := Context{
+	data := Data{
 		Lines: lines,
 	}
 
-	return c.HTML(200, "index.html", context)
+	return c.HTML(200, "index.html", data)
 }
