@@ -2,36 +2,8 @@
 
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/zpatrick/fireball/blob/master/LICENSE)
 [![Go Report Card](https://goreportcard.com/badge/github.com/zpatrick/fireball)](https://goreportcard.com/report/github.com/zpatrick/fireball)
+[![Go Doc](https://godoc.org/github.com/zpatrick/fireball?status.svg)](https://godoc.org/github.com/zpatrick/fireball)
 
-- [Overview](#overview)
-- [Installation](#installation)
-- [Getting Started](#getting-started)
-- [Routing](#routing)
-  * [Basic](#basic-routing)
-  * [Static](#static-routing)
-  * [Custom](#custom-routing)
-- [Handlers](#handlers)
-  * [Basic](#basic-handler)
-  * [Error](#error-handler)
-  * [Not Found]?
-  * [HTML](#html-handler)
-  * [JSON](#json-handler)
-  * [Authentication](#auth-handler)
-- [Response]
-  * Status
-  * Body
-  * Headers
-- [Views]
-  * [Glob Parser]()
-  * [Custom]()
-- [Testing]
-  * [Mock App]()
-- [Customization]
-  * Not Found
-  * Custom Error handling
-- [Examples](#examples)
-  * [API](/tree/master/examples/api)
-  * [Blog](/tree/master/examples/api)
 
 ## Overview
 A micro web framework written in Go
@@ -102,9 +74,10 @@ routes := []&Fireball.Route{
 }
 ```
 
-In a Fireball application, the following requests would be routed in the following way:
+The following requests would be routed as so:
+
 | URL | Method | Action | Path Variables |
-| - | - | - | - |
+| :-: | :-: | :-: | :-: |
 | `/movies/m1` | GET | `getMovie()` is called | `movie="m1"` |
 | `/movies/myMovie` | POST | `createMovie()` is called | `id="myMovie"` |
 | `/movies/m1/view` | GET | no action | n/a |
