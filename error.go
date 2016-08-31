@@ -29,10 +29,6 @@ type JSONError struct {
 }
 
 func NewJSONError(status int, err error, headers map[string]string) *JSONError {
-	if headers == nil {
-		headers = JSONHeaders
-	}
-
 	return &JSONError{
 		HTTPError: NewHTTPError(status, err, headers),
 	}

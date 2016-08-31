@@ -1,5 +1,9 @@
 package fireball
 
+import (
+	"encoding/json"
+)
+
 type Status interface {
 	Status() int
 }
@@ -30,6 +34,18 @@ func NewHTTPResponse(status int, body []byte, headers map[string]string) *HTTPRe
 	}
 }
 
+func (r *HTTPResponse) Status() int {
+	return r.status
+}
+
+func (r *HTTPResponse) Body() []byte {
+	return r.body
+}
+
+func (r *HTTPResponse) Headers() map[string]string {
+	return r.headers
+}
+
 func NewJSONResponse(status int, data interface{}, headers map[string]string) (*HTTPResponse, error) {
 	if headers == nil {
 		headers = JSONHeaders
@@ -42,16 +58,4 @@ func NewJSONResponse(status int, data interface{}, headers map[string]string) (*
 
 	response := NewHTTPResponse(status, bytes, headers)
 	return response, nil
-}
-
-func (r *HTTPResponse) Status() int {
-	return r.status
-}
-
-func (r *HTTPResponse) Body() []byte {
-	return r.body
-}
-
-func (r *HTTPResponse) Headers() map[string]string {
-	return r.headers
 }

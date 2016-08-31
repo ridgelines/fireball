@@ -1,24 +1,25 @@
-package handlers
+package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/zpatrick/fireball"
 	"github.com/zpatrick/fireball/examples/api/models"
 	"github.com/zpatrick/fireball/examples/api/stores"
 	"math/rand"
 )
 
-type MovieHandler struct {
+type MovieController struct {
 	Store *stores.MovieStore
 }
 
-func NewMovieHandler(store *stores.MovieStore) *MovieHandler {
-	return &MovieHandler{
+func NewMovieController(store *stores.MovieStore) *MovieController {
+	return &MovieController{
 		Store: store,
 	}
 }
 
-func (h *MovieHandler) Routes() []*fireball.Route {
+func (h *MovieController) Routes() []*fireball.Route {
 	routes := []*fireball.Route{
 		&fireball.Route{
 			Path: "/movies",
@@ -39,33 +40,30 @@ func (h *MovieHandler) Routes() []*fireball.Route {
 	return routes
 }
 
-func (h *MovieHandler) ListMovies(c *fireball.Context) (interface{}, error) {
+func (h *MovieController) ListMovies(c *fireball.Context) (interface{}, error) {
 	movies, err := h.Store.SelectAll().Execute()
 	if err != nil {
-		return nil, c.JSONError(500, err)
+		return nil, fireball.NewJSONError(500, err, nil)
 	}
 
-	return c.JSON(200, movies)
+	return fireball.NewJSONResponse(200, movies, nil)
 }
 
-func (h *MovieHandler) CreateMovie(c *fireball.Context) (interface{}, error) {
+func (h *MovieController) CreateMovie(c *fireball.Context) (interface{}, error) {
 	var movie models.Movie
-	decoder := json.NewDecoder(c.Request().Body)
-
-	if err := decoder.Decode(&movie); err != nil {
-		return nil, c.JSONError(400, err)
+	if err := json.NewDecoder(c.Request().Body).Decode(&movie); err != nil {
+		return nil, fireball.NewJSONError(400, err, nil)
 	}
 
-	movie.ID = randomID(10)
-
+	movie.ID = randomID(5)
 	if err := h.Store.Insert(&movie).Execute(); err != nil {
-		return nil, c.JSONError(500, err)
+		return nil, fireball.NewJSONError(500, err, nil)
 	}
 
-	return c.JSON(200, movie)
+	return fireball.NewJSONResponse(200, movie, nil)
 }
 
-func (h *MovieHandler) GetMovie(c *fireball.Context) (interface{}, error) {
+func (h *MovieController) GetMovie(c *fireball.Context) (interface{}, error) {
 	id := c.PathVar("id")
 
 	movieIDMatch := func(m *models.Movie) bool {
@@ -74,29 +72,31 @@ func (h *MovieHandler) GetMovie(c *fireball.Context) (interface{}, error) {
 
 	movie, err := h.Store.SelectAll().Where(movieIDMatch).FirstOrNil().Execute()
 	if err != nil {
-		return nil, c.JSONError(500, err)
+		return nil, fireball.NewJSONError(500, err, nil)
 	}
 
 	if movie == nil {
-		return nil, c.JSONErrorf(400, "Movie with id '%s' does not exist", id)
+		err := fmt.Errorf("Movie with id '%s' does not exist", id)
+		return nil, fireball.NewJSONError(400, err, nil)
 	}
 
-	return c.JSON(200, movie)
+	return fireball.NewJSONResponse(200, movie, nil)
 }
 
-func (h *MovieHandler) DeleteMovie(c *fireball.Context) (interface{}, error) {
+func (h *MovieController) DeleteMovie(c *fireball.Context) (interface{}, error) {
 	id := c.PathVar("id")
 
 	existed, err := h.Store.Delete(id).Execute()
 	if err != nil {
-		return nil, c.JSONError(500, err)
+		return nil, fireball.NewJSONError(500, err, nil)
 	}
 
 	if !existed {
-		return nil, c.JSONErrorf(400, "Movie with id '%s' does not exist", id)
+		err := fmt.Errorf("Movie with id '%s' does not exist", id)
+		return nil, fireball.NewJSONError(400, err, nil)
 	}
 
-	return c.JSON(200, nil)
+	return fireball.NewJSONResponse(200, nil, nil)
 }
 
 const runes = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
