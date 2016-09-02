@@ -6,9 +6,8 @@ import (
 
 func addAuth(handler fireball.Handler) fireball.Handler {
 	return func(c *fireball.Context) (interface{}, error) {
-		user, pass, _ := c.Request().BasicAuth()
-
-		if user == "user" && pass == "pass" {
+		user, pass, ok := c.Request.BasicAuth()
+		if ok && user == "user" && pass == "pass" {
 			return handler(c)
 		}
 

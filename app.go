@@ -43,9 +43,15 @@ func (a *App) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	c := &Context{
 		PathVariables: match.PathVariables,
 		Parser:        a.Parser,
-		request:       r,
+		Request:       r,
+		Writer:        w,
+		Meta:          map[string]interface{}{},
 	}
 
+	// todo: what if output is a type of fireball.Redirect?
+	// would that work at all?
+	// type Redirect func() *Route
+	// Handler(c){ return c.Redirect(this.Index), nil }
 	output, err := match.Handler(c)
 	if err != nil {
 		a.Error(w, err)

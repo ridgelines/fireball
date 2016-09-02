@@ -13,7 +13,9 @@ var (
 type Context struct {
 	PathVariables map[string]string
 	Parser        TemplateParser
-	request       *http.Request
+	Request       *http.Request
+	Writer        http.ResponseWriter
+	Meta          map[string]interface{}
 }
 
 func (c *Context) HTML(status int, file string, data interface{}) (*HTTPResponse, error) {
@@ -29,12 +31,4 @@ func (c *Context) HTML(status int, file string, data interface{}) (*HTTPResponse
 
 	response := NewHTTPResponse(status, buffer.Bytes(), HTMLHeaders)
 	return response, nil
-}
-
-func (c *Context) Request() *http.Request {
-	return c.request
-}
-
-func (c *Context) PathVar(key string) string {
-	return c.PathVariables[key]
 }

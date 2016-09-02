@@ -53,7 +53,7 @@ func NewJSONResponse(status int, data interface{}, headers map[string]string) (*
 
 	bytes, err := json.Marshal(data)
 	if err != nil {
-		return nil, err
+		return nil, NewJSONError(500, err, JSONHeaders)
 	}
 
 	response := NewHTTPResponse(status, bytes, headers)

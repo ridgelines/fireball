@@ -1,7 +1,9 @@
 # Fireball
 
+[![Build Status](https://travis-ci.org/urfave/cli.svg?branch=master)](https://travis-ci.org/urfave/cli)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/zpatrick/fireball/blob/master/LICENSE)
 [![Go Report Card](https://goreportcard.com/badge/github.com/zpatrick/fireball)](https://goreportcard.com/report/github.com/zpatrick/fireball)
+[![Go Doc](https://godoc.org/github.com/zpatrick/fireball?status.svg)](https://godoc.org/github.com/zpatrick/fireball)
 
 - [Overview](#overview)
 - [Installation](#installation)

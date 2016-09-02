@@ -10,7 +10,6 @@ type Router interface {
 }
 
 type RouteMatch struct {
-	Route         *Route
 	Handler       Handler
 	PathVariables map[string]string
 }
@@ -54,7 +53,6 @@ func (r *BasicRouter) matchRoute(route *Route, req *http.Request) *RouteMatch {
 	}
 
 	routeMatch := &RouteMatch{
-		Route:         route,
 		Handler:       handler,
 		PathVariables: pathVariables,
 	}

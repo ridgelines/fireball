@@ -19,20 +19,20 @@ func NewMovieController(store *stores.MovieStore) *MovieController {
 	}
 }
 
-func (h *MovieController) Routes() []*fireball.Route {
+func (m *MovieController) Routes() []*fireball.Route {
 	routes := []*fireball.Route{
 		&fireball.Route{
 			Path: "/movies",
 			Handlers: map[string]fireball.Handler{
-				"GET":  h.ListMovies,
-				"POST": addAuth(h.CreateMovie),
+				"GET":  m.ListMovies,
+				"POST": m.CreateMovie,
 			},
 		},
 		&fireball.Route{
 			Path: "/movies/{id}",
 			Handlers: map[string]fireball.Handler{
-				"GET":    addAuth(h.GetMovie),
-				"DELETE": addAuth(h.DeleteMovie),
+				"GET":    m.GetMovie,
+				"DELETE": m.DeleteMovie,
 			},
 		},
 	}
@@ -40,8 +40,8 @@ func (h *MovieController) Routes() []*fireball.Route {
 	return routes
 }
 
-func (h *MovieController) ListMovies(c *fireball.Context) (interface{}, error) {
-	movies, err := h.Store.SelectAll().Execute()
+func (m *MovieController) ListMovies(c *fireball.Context) (interface{}, error) {
+	movies, err := m.Store.SelectAll().Execute()
 	if err != nil {
 		return nil, fireball.NewJSONError(500, err, nil)
 	}
@@ -49,28 +49,28 @@ func (h *MovieController) ListMovies(c *fireball.Context) (interface{}, error) {
 	return fireball.NewJSONResponse(200, movies, nil)
 }
 
-func (h *MovieController) CreateMovie(c *fireball.Context) (interface{}, error) {
-	var movie models.Movie
-	if err := json.NewDecoder(c.Request().Body).Decode(&movie); err != nil {
+func (m *MovieController) CreateMovie(c *fireball.Context) (interface{}, error) {
+	var movie *models.Movie
+	if err := json.NewDecoder(c.Request.Body).Decode(&movie); err != nil {
 		return nil, fireball.NewJSONError(400, err, nil)
 	}
 
 	movie.ID = randomID(5)
-	if err := h.Store.Insert(&movie).Execute(); err != nil {
+	if err := m.Store.Insert(movie).Execute(); err != nil {
 		return nil, fireball.NewJSONError(500, err, nil)
 	}
 
 	return fireball.NewJSONResponse(200, movie, nil)
 }
 
-func (h *MovieController) GetMovie(c *fireball.Context) (interface{}, error) {
-	id := c.PathVar("id")
+func (m *MovieController) GetMovie(c *fireball.Context) (interface{}, error) {
+	id := c.PathVariables["id"]
 
 	movieIDMatch := func(m *models.Movie) bool {
 		return m.ID == id
 	}
 
-	movie, err := h.Store.SelectAll().Where(movieIDMatch).FirstOrNil().Execute()
+	movie, err := m.Store.SelectAll().Where(movieIDMatch).FirstOrNil().Execute()
 	if err != nil {
 		return nil, fireball.NewJSONError(500, err, nil)
 	}
@@ -83,10 +83,10 @@ func (h *MovieController) GetMovie(c *fireball.Context) (interface{}, error) {
 	return fireball.NewJSONResponse(200, movie, nil)
 }
 
-func (h *MovieController) DeleteMovie(c *fireball.Context) (interface{}, error) {
-	id := c.PathVar("id")
+func (m *MovieController) DeleteMovie(c *fireball.Context) (interface{}, error) {
+	id := c.PathVariables["id"]
 
-	existed, err := h.Store.Delete(id).Execute()
+	existed, err := m.Store.Delete(id).Execute()
 	if err != nil {
 		return nil, fireball.NewJSONError(500, err, nil)
 	}
