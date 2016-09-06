@@ -8,7 +8,7 @@ import (
 
 func main() {
 	routes := []*fireball.Route{
-		&fireball.Route{
+		{
 			Path: "/",
 			Handlers: map[string]fireball.Handler{
 				"GET": func(c *fireball.Context) (interface{}, error) {

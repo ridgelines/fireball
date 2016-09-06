@@ -20,7 +20,7 @@ func NewIndexController(store sessions.Store) *IndexController {
 
 func (i *IndexController) Routes() []*fireball.Route {
 	routes := []*fireball.Route{
-		&fireball.Route{
+		{
 			Path: "/",
 			Handlers: map[string]fireball.Handler{
 				"GET": i.Index,

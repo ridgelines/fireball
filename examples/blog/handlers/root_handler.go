@@ -12,7 +12,7 @@ func NewRootHandler() *RootHandler {
 
 func (h *RootHandler) Routes() []*fireball.Route {
 	routes := []*fireball.Route{
-		&fireball.Route{
+		{
 			Path: "/",
 			Get:  h.Index,
 		},

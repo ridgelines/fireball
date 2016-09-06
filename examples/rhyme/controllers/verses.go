@@ -127,7 +127,7 @@ func getRhymes(word string) ([]Word, error) {
 }
 
 var Songs = []*Song{
-	&Song{
+	{
 		Title:  "Nuthing but a G Thang",
 		Artist: "Dr. DRE feat. Snoop Dogg",
 		Link:   "http://genius.com/Dr-dre-nuthin-but-a-g-thang-lyrics",
@@ -196,7 +196,7 @@ var Songs = []*Song{
 			"Like my nigga D.O.C., no one can do it better",
 		},
 	},
-	&Song{
+	{
 		Title:  "Juicy",
 		Artist: "The Notorious B.I.G.",
 		Link:   "http://genius.com/The-notorious-big-juicy-lyrics",
@@ -268,7 +268,7 @@ var Songs = []*Song{
 			"And if you don't know, now you know, nigga",
 		},
 	},
-	&Song{
+	{
 		Title:  "Straight Outta Compton",
 		Artist: "N.W.A.",
 		Link:   "http://genius.com/Nwa-straight-outta-compton-lyrics",
@@ -358,7 +358,7 @@ var Songs = []*Song{
 			"Word to the motherfucker, straight outta Compton",
 		},
 	},
-	&Song{
+	{
 		Title:  "C.R.E.A.M.",
 		Artist: "Wu-Tang Clan",
 		Link:   "http://genius.com/Wu-tang-clan-cream-lyrics",
@@ -427,7 +427,7 @@ var Songs = []*Song{
 			"You gotta get over - straight up and down",
 		},
 	},
-	&Song{
+	{
 		Title:  "Big Pimpin'",
 		Artist: "Jay Z",
 		Link:   "http://genius.com/Jay-z-big-pimpin-lyrics",
@@ -514,7 +514,7 @@ var Songs = []*Song{
 			"Laughing it up, Jigga Man: that's what's up",
 		},
 	},
-	&Song{
+	{
 		Title:  "99 Problems",
 		Artist: "Jay Z",
 		Link:   "http://genius.com/Jay-z-99-problems-lyrics",
@@ -585,7 +585,7 @@ var Songs = []*Song{
 			"I got 99 problems, but a bitch ain't one; hit me!",
 		},
 	},
-	&Song{
+	{
 		Title:  "Dear Momma",
 		Artist: "2Pac",
 		Link:   "http://genius.com/2pac-dear-mama-lyrics",
@@ -663,7 +663,7 @@ var Songs = []*Song{
 			"Is to show you that I understand; you are appreciated",
 		},
 	},
-	&Song{
+	{
 		Title:  "California Love",
 		Artist: "2Pac",
 		Link:   "http://genius.com/2pac-california-love-lyrics",
@@ -715,7 +715,7 @@ var Songs = []*Song{
 			"Cause you and I know it's tha best side",
 		},
 	},
-	&Song{
+	{
 		Title:  "In Da Club",
 		Artist: "50 Cent",
 		Link:   "http://genius.com/50-cent-in-da-club-lyrics",
@@ -769,7 +769,7 @@ var Songs = []*Song{
 			"They know where we fucking be",
 		},
 	},
-	&Song{
+	{
 		Title:  "Lose Yourself",
 		Artist: "Eminem",
 		Link:   "http://genius.com/Eminem-lose-yourself-lyrics",
@@ -840,7 +840,7 @@ var Songs = []*Song{
 			"This may be the only opportunity that I got",
 		},
 	},
-	&Song{
+	{
 		Title:  "It Was A Good Day",
 		Artist: "Ice Cube",
 		Link:   "http://genius.com/Ice-cube-it-was-a-good-day-lyrics",
@@ -910,7 +910,7 @@ var Songs = []*Song{
 			"What the fuck I'm thinkin about?",
 		},
 	},
-	&Song{
+	{
 		Title:  "The World is Yours",
 		Artist: "Nas",
 		Link:   "http://genius.com/Nas-the-world-is-yours-lyrics",
@@ -977,7 +977,7 @@ var Songs = []*Song{
 			"Checkin' dames, plus the games people play bust the problems of the world today",
 		},
 	},
-	&Song{
+	{
 		Title:  "Buggin' Out",
 		Artist: "A Tribe Called Quest",
 		Link:   "http://genius.com/A-tribe-called-quest-buggin-out-lyrics",

@@ -21,14 +21,14 @@ func NewMovieController(store *stores.MovieStore) *MovieController {
 
 func (m *MovieController) Routes() []*fireball.Route {
 	routes := []*fireball.Route{
-		&fireball.Route{
+		{
 			Path: "/movies",
 			Handlers: map[string]fireball.Handler{
 				"GET":  m.ListMovies,
 				"POST": m.CreateMovie,
 			},
 		},
-		&fireball.Route{
+		{
 			Path: "/movies/{id}",
 			Handlers: map[string]fireball.Handler{
 				"GET":    m.GetMovie,

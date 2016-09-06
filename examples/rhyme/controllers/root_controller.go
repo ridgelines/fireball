@@ -13,7 +13,7 @@ func NewRootController() *RootController {
 
 func (h *RootController) Routes() []*fireball.Route {
 	routes := []*fireball.Route{
-		&fireball.Route{
+		{
 			Path: "/",
 			Handlers: map[string]fireball.Handler{
 				"GET": h.Index,
