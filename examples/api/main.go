@@ -27,6 +27,7 @@ func main() {
 		fireball.SessionDecorator(store, time.Minute*1))
 
 	app := fireball.NewApp(routes)
+	app.ErrorHandler = controllers.JSONErrorHandler
 
 	fmt.Println("Running on port 8000")
 	http.ListenAndServe(":8000", app)

@@ -22,14 +22,14 @@ func Decorate(routes []*Route, decorators ...Decorator) []*Route {
 
 func BasicAuthDecorator(username, password string) Decorator {
 	return func(handler Handler) Handler {
-		return func(c *Context) (interface{}, error) {
+		return func(c *Context) (Response, error) {
 			user, pass, ok := c.Request.BasicAuth()
 			if ok && user == username && pass == password {
 				return handler(c)
 			}
 
 			headers := map[string]string{"WWW-Authenticate": "Basic realm=\"Restricted\""}
-			response := NewHTTPResponse(401, []byte("401 Unauthorized\n"), headers)
+			response := NewResponse(401, []byte("401 Unauthorized\n"), headers)
 			return response, nil
 		}
 	}
@@ -37,7 +37,7 @@ func BasicAuthDecorator(username, password string) Decorator {
 
 func LogDecorator() Decorator {
 	return func(handler Handler) Handler {
-		return func(c *Context) (interface{}, error) {
+		return func(c *Context) (Response, error) {
 			log.Printf("%s %s\n", c.Request.Method, c.Request.URL.String())
 			return handler(c)
 		}
@@ -48,7 +48,7 @@ func LogDecorator() Decorator {
 // need use context.ClearHandler: http.ListenAndServe(":8080", context.ClearHandler(http.DefaultServeMux)))
 func SessionDecorator(store sessions.Store, expiration time.Duration) Decorator {
 	return func(handler Handler) Handler {
-		return func(c *Context) (interface{}, error) {
+		return func(c *Context) (Response, error) {
 			session, err := store.Get(c.Request, "session")
 			if err != nil {
 				return nil, err

@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"github.com/zpatrick/fireball"
-	"github.com/zpatrick/fireball/examples/rhyme/handlers"
+	"github.com/zpatrick/fireball/examples/rhyme/controllers"
 	"log"
 	"math/rand"
 	"net/http"
@@ -15,11 +15,11 @@ func main() {
 	flag.Parse()
 
 	rand.Seed(time.Now().UTC().UnixNano())
-	go handlers.Init()
+	go controllers.Init()
 
-	rootHandler := handlers.NewRootHandler()
-	app := fireball.NewApp()
-	app.Routes = append(app.Routes, rootHandler.Routes()...)
+	rootController := controllers.NewRootController()
+	app := fireball.NewApp(rootController.Routes())
+
 	http.Handle("/", app)
 
 	fs := http.FileServer(http.Dir("static"))

@@ -40,30 +40,30 @@ func (m *MovieController) Routes() []*fireball.Route {
 	return routes
 }
 
-func (m *MovieController) ListMovies(c *fireball.Context) (interface{}, error) {
+func (m *MovieController) ListMovies(c *fireball.Context) (fireball.Response, error) {
 	movies, err := m.Store.SelectAll().Execute()
 	if err != nil {
-		return nil, fireball.NewJSONError(500, err, nil)
+		return nil, err
 	}
 
-	return fireball.NewJSONResponse(200, movies, nil)
+	return fireball.NewJSONResponse(200, movies, Headers)
 }
 
-func (m *MovieController) CreateMovie(c *fireball.Context) (interface{}, error) {
+func (m *MovieController) CreateMovie(c *fireball.Context) (fireball.Response, error) {
 	var movie *models.Movie
 	if err := json.NewDecoder(c.Request.Body).Decode(&movie); err != nil {
-		return nil, fireball.NewJSONError(400, err, nil)
+		return fireball.NewJSONError(400, err, Headers)
 	}
 
 	movie.ID = randomID(5)
 	if err := m.Store.Insert(movie).Execute(); err != nil {
-		return nil, fireball.NewJSONError(500, err, nil)
+		return nil, err
 	}
 
-	return fireball.NewJSONResponse(200, movie, nil)
+	return fireball.NewJSONResponse(200, movie, Headers)
 }
 
-func (m *MovieController) GetMovie(c *fireball.Context) (interface{}, error) {
+func (m *MovieController) GetMovie(c *fireball.Context) (fireball.Response, error) {
 	id := c.PathVariables["id"]
 
 	movieIDMatch := func(m *models.Movie) bool {
@@ -72,31 +72,31 @@ func (m *MovieController) GetMovie(c *fireball.Context) (interface{}, error) {
 
 	movie, err := m.Store.SelectAll().Where(movieIDMatch).FirstOrNil().Execute()
 	if err != nil {
-		return nil, fireball.NewJSONError(500, err, nil)
+		return nil, err
 	}
 
 	if movie == nil {
 		err := fmt.Errorf("Movie with id '%s' does not exist", id)
-		return nil, fireball.NewJSONError(400, err, nil)
+		return fireball.NewJSONError(400, err, Headers)
 	}
 
-	return fireball.NewJSONResponse(200, movie, nil)
+	return fireball.NewJSONResponse(200, movie, Headers)
 }
 
-func (m *MovieController) DeleteMovie(c *fireball.Context) (interface{}, error) {
+func (m *MovieController) DeleteMovie(c *fireball.Context) (fireball.Response, error) {
 	id := c.PathVariables["id"]
 
 	existed, err := m.Store.Delete(id).Execute()
 	if err != nil {
-		return nil, fireball.NewJSONError(500, err, nil)
+		return nil, err
 	}
 
 	if !existed {
 		err := fmt.Errorf("Movie with id '%s' does not exist", id)
-		return nil, fireball.NewJSONError(400, err, nil)
+		return fireball.NewJSONError(400, err, Headers)
 	}
 
-	return fireball.NewJSONResponse(200, nil, nil)
+	return fireball.NewJSONResponse(200, nil, Headers)
 }
 
 const runes = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"

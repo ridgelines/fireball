@@ -1,61 +1,32 @@
 package fireball
 
 import (
-	"encoding/json"
+	"net/http"
 )
 
-type Status interface {
-	Status() int
-}
-
-type Body interface {
-	Body() []byte
-}
-
-type Headers interface {
-	Headers() map[string]string
+type Response interface {
+	Write(http.ResponseWriter, *http.Request)
 }
 
 type HTTPResponse struct {
-	status  int
-	body    []byte
-	headers map[string]string
+	Status  int
+	Body    []byte
+	Headers map[string]string
 }
 
-func NewHTTPResponse(status int, body []byte, headers map[string]string) *HTTPResponse {
-	if headers == nil {
-		headers = map[string]string{}
-	}
-
+func NewResponse(status int, body []byte, headers map[string]string) *HTTPResponse {
 	return &HTTPResponse{
-		status:  status,
-		body:    body,
-		headers: headers,
+		Status:  status,
+		Body:    body,
+		Headers: headers,
 	}
 }
 
-func (r *HTTPResponse) Status() int {
-	return r.status
-}
-
-func (r *HTTPResponse) Body() []byte {
-	return r.body
-}
-
-func (r *HTTPResponse) Headers() map[string]string {
-	return r.headers
-}
-
-func NewJSONResponse(status int, data interface{}, headers map[string]string) (*HTTPResponse, error) {
-	if headers == nil {
-		headers = JSONHeaders
+func (h *HTTPResponse) Write(w http.ResponseWriter, r *http.Request) {
+	for key, val := range h.Headers {
+		w.Header().Set(key, val)
 	}
 
-	bytes, err := json.Marshal(data)
-	if err != nil {
-		return nil, NewJSONError(500, err, JSONHeaders)
-	}
-
-	response := NewHTTPResponse(status, bytes, headers)
-	return response, nil
+	w.WriteHeader(h.Status)
+	w.Write(h.Body)
 }

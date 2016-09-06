@@ -1,7 +1,7 @@
 package fireball
 
 import (
-	"encoding/json"
+	"net/http"
 )
 
 type HTTPError struct {
@@ -9,9 +9,9 @@ type HTTPError struct {
 	Err error
 }
 
-func NewHTTPError(status int, err error, headers map[string]string) *HTTPError {
+func NewError(status int, err error, headers map[string]string) *HTTPError {
 	return &HTTPError{
-		HTTPResponse: NewHTTPResponse(status, nil, headers),
+		HTTPResponse: NewResponse(status, []byte(err.Error()), headers),
 		Err:          err,
 	}
 }
@@ -20,31 +20,12 @@ func (e *HTTPError) Error() string {
 	return e.Err.Error()
 }
 
-func (e *HTTPError) Body() []byte {
-	return []byte(e.Err.Error())
-}
-
-type JSONError struct {
-	*HTTPError
-}
-
-func NewJSONError(status int, err error, headers map[string]string) *JSONError {
-	return &JSONError{
-		HTTPError: NewHTTPError(status, err, headers),
-	}
-}
-
-func (e *JSONError) Body() []byte {
-	s := struct {
-		Error string
-	}{
-		Error: e.Err.Error(),
+func DefaultErrorHandler(w http.ResponseWriter, r *http.Request, err error) {
+	if err, ok := err.(Response); ok {
+		err.Write(w, r)
+		return
 	}
 
-	bytes, err := json.Marshal(s)
-	if err != nil {
-		return []byte(err.Error())
-	}
-
-	return bytes
+	w.WriteHeader(http.StatusInternalServerError)
+	w.Write([]byte(err.Error()))
 }

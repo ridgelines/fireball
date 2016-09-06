@@ -1,6 +1,6 @@
 package fireball
 
-type Handler func(c *Context) (interface{}, error)
+type Handler func(c *Context) (Response, error)
 
 type Route struct {
 	Path     string

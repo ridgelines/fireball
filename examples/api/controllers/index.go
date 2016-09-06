@@ -6,6 +6,8 @@ import (
 	"github.com/zpatrick/fireball"
 )
 
+var Headers = fireball.JSONHeaders
+
 type IndexController struct {
 	Store sessions.Store
 }
@@ -29,7 +31,7 @@ func (i *IndexController) Routes() []*fireball.Route {
 	return routes
 }
 
-func (h *IndexController) Index(c *fireball.Context) (interface{}, error) {
+func (h *IndexController) Index(c *fireball.Context) (fireball.Response, error) {
 	session := c.Meta["session"].(*sessions.Session)
 
 	count, ok := session.Values["count"].(int)
@@ -39,5 +41,6 @@ func (h *IndexController) Index(c *fireball.Context) (interface{}, error) {
 
 	count += 1
 	session.Values["count"] = count
-	return fmt.Sprintf("You have visited this page %d times", count), nil
+	body := fmt.Sprintf("You have visited this page %d times", count)
+	return fireball.NewResponse(200, []byte(body), nil), nil
 }

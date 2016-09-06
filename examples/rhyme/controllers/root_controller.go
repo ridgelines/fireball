@@ -1,21 +1,23 @@
-package handlers
+package controllers
 
 import (
 	"github.com/zpatrick/fireball"
 	"math/rand"
 )
 
-type RootHandler struct{}
+type RootController struct{}
 
-func NewRootHandler() *RootHandler {
-	return &RootHandler{}
+func NewRootController() *RootController {
+	return &RootController{}
 }
 
-func (h *RootHandler) Routes() []*fireball.Route {
+func (h *RootController) Routes() []*fireball.Route {
 	routes := []*fireball.Route{
 		&fireball.Route{
 			Path: "/",
-			Get:  h.Index,
+			Handlers: map[string]fireball.Handler{
+				"GET": h.Index,
+			},
 		},
 	}
 
@@ -26,7 +28,7 @@ type Data struct {
 	Lines []*Line
 }
 
-func (h *RootHandler) Index(c *fireball.Context) (interface{}, error) {
+func (h *RootController) Index(c *fireball.Context) (fireball.Response, error) {
 	lines := []*Line{}
 
 	for len(lines) < 4 {
