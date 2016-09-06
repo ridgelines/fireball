@@ -16,12 +16,6 @@ func main() {
 			"GET": index,
 		},
 	}
-	&Fireball.Route{
-		Path: "/users/{user}/orders/{order}",
-		Methods: map[string]fireball.Handler{
-			"GET": getUserOrder,
-		},
-	}
 
 	routes := []*fireball.Route{indexRoute}
 	app := fireball.NewApp(routes)

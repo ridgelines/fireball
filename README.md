@@ -1,13 +1,14 @@
 # Fireball
 
-[![Build Status](https://travis-ci.org/urfave/cli.svg?branch=master)](https://travis-ci.org/urfave/cli)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/zpatrick/fireball/blob/master/LICENSE)
 [![Go Report Card](https://goreportcard.com/badge/github.com/zpatrick/fireball)](https://goreportcard.com/report/github.com/zpatrick/fireball)
 [![Go Doc](https://godoc.org/github.com/zpatrick/fireball?status.svg)](https://godoc.org/github.com/zpatrick/fireball)
 
 
 ## Overview
-A micro web framework written in Go
+Fireball is a micro web framework written in Go. 
+Unlike many web frameworks written in Go, handlers in Fireball applications return objects instead instead of writing them directly to a http.ResponseWriter. 
+This aims to make them feel more like "regular" Go functions, and it pushes some of the tediousness of the http layer away from the business logic.
 
 ## Installation
 To install this package, run:
@@ -22,76 +23,112 @@ To run this example, create a `main.go` file with the following:
 package main
 
 import (
-  "fmt"
   "github.com/zpatrick/fireball"
   "net/http"
 )
 
+func index(c *fireball.Context) (fireball.Response, error) {
+  return fireball.NewResponse(200, []byte("Hello, World!"), nil), nil
+}
+
 func main() {
-  routes := []*fireball.Route{
-    &fireball.Route{
-      Path: "/",
-      Handlers: map[string]fireball.Handler{
-        "GET": func(c *fireball.Context) (interface{}, error) {
-          return "Hello, World!", nil
-        },
-      },
+  indexRoute := &fireball.Route{
+    Path: "/",
+    Handlers: map[string]fireball.Handler{
+      "GET": index,
     },
   }
 
+  routes := []*fireball.Route{indexRoute}
   app := fireball.NewApp(routes)
-
-  fmt.Println("Running on port 8000")
   http.ListenAndServe(":8000", app)
 }
 ```
 
 This will run a new webserver at `localhost:8000`
 
-## Routing
+## Handlers
+[Handlers](https://godoc.org/github.com/zpatrick/fireball#Handler) perform the business logic associated with requests. All Handlers take a [Context](https://godoc.org/github.com/zpatrick/fireball#Context) object which
+provides some helper functions fields. 
+Handlers must return either a [Response](https://godoc.org/github.com/zpatrick/fireball#Response) or an error. 
+Fireball will return write the appropriate response based on what was returned from the Handler. 
 
-### Basic Routes
-Fireball uses **Route** objects to dispatch requests to handlers.
-The **Path** field determines which URLs should be dispached to your Route. 
-You can use `{variable}` blocks in the Path to match any string that doesn't contain a `"/"` character.
-Routes also contain a maping of http methods to different **Handlers** which perform the business logic.
+### HTTP Response
+The [HTTP Response](https://godoc.org/github.com/zpatrick/fireball#HTTPResponse) object implements the [Response](https://godoc.org/github.com/zpatrick/fireball#Response) interface. 
+When the Write call is performed, the specified Body, Status, and Headers will be written to the http.ResponseWriter.
 
-For example, take the following Fireball Routes:
+Examples:
 ```
-routes := []&Fireball.Route{
-    &Fireball.Route{
-        Path: "/movies/{movie}",
-        Methods: map[string]fireball.Handler{
-            "GET": getMovie,
-            "POST": createMovie,
-        }
-    },
-    &Fireball.Route{
-        Path: "/users/{user}/orders/{order}",
-        Methods: map[string]fireball.Handler{
-            "GET": getUserOrder,
-        }
-    },
+func Index(c *fireball.Context) (fireball.Response, error) {
+    return fireball.NewResponse(200, []byte("Hello, World"), fireball.TextHeaders), nil
 }
 ```
 
-The following requests would be routed as so:
+```
+func Index(c *fireball.Context) (fireball.Response, error) {
+    html := []byte("<h1>Hello, World</h1>")
+    return fireball.NewResponse(200, html, fireball.HTMLHeaders), nil
+}
+```
 
-| URL | Method | Action | Path Variables |
-| :-: | :-: | :-: | :-: |
-| `/movies/m1` | GET | `getMovie()` is called | `movie="m1"` |
-| `/movies/myMovie` | POST | `createMovie()` is called | `id="myMovie"` |
-| `/movies/m1/view` | GET | no action | n/a |
-| `/movies` | GET | no action | n/a | 
-| `/movies/m1` | DELETE | no action | n/a |
-| `/users/u1/orders/o1` | GET | `getUserOrder()` is called| `user="u1"`, `order="o1"` |
+### HTTP Error
+If a Handler returns a non-nil error, the Fireball Application will call its [ErrorHandler](https://godoc.org/github.com/zpatrick/fireball#App) function. 
+By default (if your Application object uses the [DefaultErrorHandler](https://godoc.org/github.com/zpatrick/fireball#DefaultErrorHandler)), the application will check if the error implements the [Response](https://godoc.org/github.com/zpatrick/fireball#Response) interface. If so, the the error's Write function will be called. 
+Otherwise, a 500 with the content of err.Error() will be written. 
 
-For more information on Handlers (including how to access the variable(s) specified in the URL), see the [Handlers](#Handlers) section.
+The [HTTPError](https://godoc.org/github.com/zpatrick/fireball#HTTPError) object implements both the [Error](https://golang.org/pkg/builtin/#error) and [Response](https://godoc.org/github.com/zpatrick/fireball#Response) interfaces. 
+
+Examples:
+```
+func Index(c *fireball.Context) (fireball.Response, error) {
+    return nil, fmt.Errorf("an error occurred")
+}
+```
+```
+func Index(c *fireball.Context) (fireball.Response, error) {
+    if err := do(); err != nil {
+        return nil, fireball.NewError(500, err, fireball.TextHeaders)
+    }
+    
+    return fireball.NewResponse(200, bytes, fireball.TextHeaders), nil
+}
+```
+
+
+
+## Routing
+
+### BasicRouter
+By default, Fireball uses the [BasicRouter](https://godoc.org/github.com/zpatrick/fireball#BasicRouter) object to match requests to [Route](https://godoc.org/github.com/zpatrick/fireball#Route) objects.
+The Route's Path field determines which URL patterns should be dispached to your Route. 
+The Route's Handlers field maps different HTTP methods to different [Handlers](https://godoc.org/github.com/zpatrick/fireball#Handler).
+
+You can use `{variable}` blocks in the Path to match any string that doesn't contain a `"/"` character.
+The variables defined in the Route's Path field can be accessed using the [Context](https://godoc.org/github.com/zpatrick/fireball#Context) object.
+
+
+Example:
+```
+route := &Fireball.Route{
+  Path: "/users/{userID}/orders/{orderID}",
+  Methods: map[string]fireball.Handler{
+    "GET": printUserOrder,
+  },
+}
+
+func printUserOrder(c *fireball.Context) (fireball.Response, error) {
+    userID := c.PathVariables["userID"]
+    orderID := c.PathVariables["orderID"]
+    message := fmt.Sprintf("User %s ordered item %s", userID, orderID)
+    
+    return fireball.NewResponse(200, []byte(message), nil)
+}
+```
 
 
 ### Static Routing
-Static content routing can be accomplished with the built-in **http.FileServer**.
-The follow snippet would serve files from the `static` directory (which must be in the same working directory as the snippet).
+The built-in [FileServer](https://golang.org/pkg/net/http/#FileServer) can be used to serve static content.
+The follow snippet would serve files from the `static` directory:
 ```
   app := fireball.NewApp(...)
   http.Handle("/", app)
@@ -102,7 +139,7 @@ The follow snippet would serve files from the `static` directory (which must be 
   http.ListenAndServe(":8000", nil)
 ```
 
-For example, if your application workspace contained:
+If the application workspace contained:
 ```
 app/
     main.go
@@ -110,109 +147,38 @@ app/
         hello_world.txt
 ```
 
-Making a request to `/static/hello_world.txt` would serve the proper file for you. 
+A request to `/static/hello_world.txt` would serve the desired file.
 
-### Custom Routing
-You can implement a custom **Router** for your Fireball applications as long as it satisfies the proper interface:
+
+# HTML Templates
+By default, Fireball uses the [GlobParser](https://godoc.org/github.com/zpatrick/fireball#GlobParser) to render HTML templates. 
+This object recursively searches a given directory for template files matching the given glob pattern. 
+The default root directory is `"views"`, and the default glob pattern is `"*.html"`
+The name of the templates are `path/from/root/directory` + `filename`. 
+
+For example, if the filesystem contained:
 ```
-type Router interface {
-  Match(*http.Request) (*RouteMatch, error)
+views/
+    index.html
+    partials/
+        login.html
+```
+
+The templates names generated would be `"index.html"`, and `"partials/login.html"`.
+The [Context](https://godoc.org/github.com/zpatrick/fireball#Context) contains a helper function, [HTML](https://godoc.org/github.com/zpatrick/fireball#Context.HTML), which renders templates as HTML.
+
+Example:
+```
+func Index(c *fireball.Context) (fireball.Response, error) {
+    data := "Hello, World!"
+    return c.HTML(200, "index.html", data)
 }
 ```
 
-The `Router.Match()` function is called each time an incomping request is made.
-If it matches the request to a Route, it should  should return a [RouteMatch](https://godoc.org/github.com/zpatrick/fireball#RouteMatch) object. 
-Otherwise, it should return `nil` (in which case a `NotFound` response is sent) 
 
-```
-app := fireball.NewApp(nil)
-app.Router = MyCustomRouter
-...
-```
-## Handlers
-[Handlers](https://godoc.org/github.com/zpatrick/fireball#Handler) perform the business logic associated with requests.
-Unlike most web frameworks written in Go, Handlers in Fireball applications return responses and errors instead of writing them directly to a `http.ResponseWriter`. 
-This aims to make Handlers feel more like "regular" Go functions, and it pushes some of the tediousness of the http layer away from the business logic. 
-
-All Handlers take a [Context](https://godoc.org/github.com/zpatrick/fireball#Context) object. 
-This object provides some helper functions along with access to the originating `http.Request`. 
-Handlers must return a response (an `interface{}`) or an `error`. 
-Fireball will attempt to return an appropriate response based on what was returned from the Handler. 
-It is recommended (but not required) that Handlers return [Response](#Response) objects where possible.
-
-### Response Objects
-A Handler can return any type of object as a response. 
-```
-func Index(c *fireball.Context) (interface{}, error) {
-    return "Hello, World!", nil
-}
-```
-
-By default, response objects will be rendered in default string format, contain a 200 status code, and not contain headers. This behavior can be changed depending on the type of response object that is returned:
-* The rendered response body can be overwritten by implementing the  [Body](https://godoc.org/github.com/zpatrick/fireball#Body) interface
-* The status code can be overwritten by implementing the [Status](https://godoc.org/github.com/zpatrick/fireball#Status) interface
-* The response headers can be overwritten by implementing the  [Headers](https://godoc.org/github.com/zpatrick/fireball#Headers) interface
-
-Fireball has a built-in [HTTPResponse](https://godoc.org/github.com/zpatrick/fireball#HTTPResponse) object that fulfills all of these interfaces. 
-```
-func Index(c *fireball.Context) (interface{}, error) {
-    response := fireball.NewHTTPResponse(200, []byte("Hello, World"), nil)
-    return response, nil
-}
-```
-
-### Error Objects
-If a Handler returns a non-nil error, Fireball will use error as a response instead of the response object. 
-```
-func Index(c *fireball.Context) (interface{}, error) {
-    return nil, fmt.Errorf("an error occurred")
-}
-```
-
-By default, error objects will be rendered using the `Error()` function, contain a 500 status code, and not contain headers. The same rules that apply to response objects apply to errors: the behavior can be changed depending on the type of error object that is returned:
-* The rendered response body can be overwritten by implementing the  [Body](https://godoc.org/github.com/zpatrick/fireball#Body) interface
-* The status code can be overwritten by implementing the [Status](https://godoc.org/github.com/zpatrick/fireball#Status) interface
-* The response headers can be overwritten by implementing the  [Headers](https://godoc.org/github.com/zpatrick/fireball#Headers) interface
-
-Fireball has a built-in [HTTPError](https://godoc.org/github.com/zpatrick/fireball#HTTPError) object that fulfills all of these interfaces. 
-```
-func Index(c *fireball.Context) (interface{}, error) {
-    err := fireball.NewHTTPError(500, []byte("an error occurred"), nil)
-    return nil, err
-}
-```
-
-### JSON
-Fireball has built-in support to send responses in JSON format:
-
-```
-func Index(c *fireball.Context) (interface{}, error) {
-    data := map[string]string{"hello", "world"}
-    return fireball.NewJSONResponse(200, data, nil)
-}
-```
-
-Along with sending errors in JSON format:
-```
-func Index(c *fireball.Context) (interface{}, error) {
-    err := fmt.Errorf("an error occurred")
-    return nil, fireball.NewJSONError(500, err, nil)
-}
-```
-
-### HTML
-The [Context.HTML](https://godoc.org/github.com/zpatrick/fireball#Context.HTML) function can be used to render HTML from templates in your application. 
-Please see the [Templates](#templates) section for information on how to set that up.
-
-This function takes a status code, name of the template file, and data (an `interface{}`) to send to the template renderer. 
-```
-  return c.HTML(200, "index.html", data)
-```
-
-### Authentication
-### Custom
+# Decorators
 
 
-## Template Parsing
+
 
 

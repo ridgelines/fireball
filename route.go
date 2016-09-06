@@ -11,7 +11,7 @@ type Route struct {
 	Handlers map[string]Handler
 }
 
-// RouteMatch objects are returned by the router when a request is succesfully matched
+// RouteMatch objects are returned by the router when a request is successfully matched
 type RouteMatch struct {
 	Handler       Handler
 	PathVariables map[string]string

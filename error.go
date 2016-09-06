@@ -24,6 +24,8 @@ func (e *HTTPError) Error() string {
 }
 
 // DefaultErrorHandler is the default ErrorHandler used by an App
+// If the error implements the Response interface, it will call its Write function
+// Otherwise, a 500 with the error message is returned
 func DefaultErrorHandler(w http.ResponseWriter, r *http.Request, err error) {
 	if err, ok := err.(Response); ok {
 		err.Write(w, r)

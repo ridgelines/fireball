@@ -8,6 +8,7 @@ import (
 var (
 	HTMLHeaders = map[string]string{"Content-Type": "text/html"}
 	JSONHeaders = map[string]string{"Content-Type": "application/json"}
+	TextHeaders = map[string]string{"Content-Type": "text/plain"}
 )
 
 // Context is passed into Handlers

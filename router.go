@@ -36,7 +36,7 @@ func NewBasicRouter(routes []*Route) *BasicRouter {
 }
 
 // Match attempts to match the *http.Request to a Route.
-// Sucessful matches are cached for improved performance.
+// Successful matches are cached for improved performance.
 func (r *BasicRouter) Match(req *http.Request) (*RouteMatch, error) {
 	if routeMatch, ok := r.cache[r.cacheKey(req)]; ok {
 		return routeMatch, nil
