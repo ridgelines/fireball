@@ -94,18 +94,15 @@ func Index(c *fireball.Context) (fireball.Response, error) {
 }
 ```
 
-
-
 ## Routing
 
-### BasicRouter
+### Basic Router
 By default, Fireball uses the [BasicRouter](https://godoc.org/github.com/zpatrick/fireball#BasicRouter) object to match requests to [Route](https://godoc.org/github.com/zpatrick/fireball#Route) objects.
 The Route's Path field determines which URL patterns should be dispached to your Route. 
 The Route's Handlers field maps different HTTP methods to different [Handlers](https://godoc.org/github.com/zpatrick/fireball#Handler).
 
 You can use `{variable}` blocks in the Path to match any string that doesn't contain a `"/"` character.
 The variables defined in the Route's Path field can be accessed using the [Context](https://godoc.org/github.com/zpatrick/fireball#Context) object.
-
 
 Example:
 ```
@@ -124,7 +121,6 @@ func printUserOrder(c *fireball.Context) (fireball.Response, error) {
     return fireball.NewResponse(200, []byte(message), nil)
 }
 ```
-
 
 ### Static Routing
 The built-in [FileServer](https://golang.org/pkg/net/http/#FileServer) can be used to serve static content.
@@ -165,7 +161,7 @@ views/
 ```
 
 The templates names generated would be `"index.html"`, and `"partials/login.html"`.
-The [Context](https://godoc.org/github.com/zpatrick/fireball#Context) contains a helper function, [HTML](https://godoc.org/github.com/zpatrick/fireball#Context.HTML), which renders templates as HTML.
+The [Context](https://godoc.org/github.com/zpatrick/fireball#Context) contains a helper function,  [HTML](https://godoc.org/github.com/zpatrick/fireball#Context.HTML), which renders templates as HTML.
 
 Example:
 ```
@@ -175,10 +171,15 @@ func Index(c *fireball.Context) (fireball.Response, error) {
 }
 ```
 
-
 # Decorators
+[Decorators](https://godoc.org/github.com/zpatrick/fireball#Decorator) can be used to wrap additional logic around [Handlers](https://godoc.org/github.com/zpatrick/fireball#Handler). 
+Fireball has some built-in decorators:
+* [BasicAuthDecorator](https://godoc.org/github.com/zpatrick/fireball#BasicAuthDecorator) adds basic authentication using a specified username and password
+* [LogDecorator](https://godoc.org/github.com/zpatrick/fireball#LogDecorator) logs incoming requests' method and URL
+* [SessionDecorator](https://godoc.org/github.com/zpatrick/fireball#SessionDecorator) manages [gorilla.Session](http://www.gorillatoolkit.org/pkg/sessions#Session) objects
 
-
-
-
-
+# Examples
+* JSON
+* Sessions
+* Authentication
+* Advanced HTML Templates
