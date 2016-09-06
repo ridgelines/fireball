@@ -5,20 +5,29 @@ import (
 	"strings"
 )
 
+// Router is an interface that matches an *http.Request to a RouteMatch.
+// If no matches are found, a nil RouteMatch should be returned.
 type Router interface {
 	Match(*http.Request) (*RouteMatch, error)
 }
 
-type RouteMatch struct {
-	Handler       Handler
-	PathVariables map[string]string
-}
-
+// BasicRouter attempts to match requests based on its Routes.
+// This router supports variables in the URL by using "{variable}" notation in URL sections.
+// For example, the following are all valid Paths:
+//  "/home"
+//  "/movies/{id}"
+//  "/users/{userID}/purchases/{purchaseID}"
+// Matched Path Variables can be retrieved in Handlers by the Context:
+//  func Handler(c *Context) (Response, error) {
+//      id := c.PathVariables["id"]
+//      ...
+//  }
 type BasicRouter struct {
 	Routes []*Route
 	cache  map[string]*RouteMatch
 }
 
+// NewBasicRouter returns a new BasicRouter with the specified Routes
 func NewBasicRouter(routes []*Route) *BasicRouter {
 	return &BasicRouter{
 		Routes: routes,
@@ -26,6 +35,8 @@ func NewBasicRouter(routes []*Route) *BasicRouter {
 	}
 }
 
+// Match attempts to match the *http.Request to a Route.
+// Sucessful matches are cached for improved performance.
 func (r *BasicRouter) Match(req *http.Request) (*RouteMatch, error) {
 	if routeMatch, ok := r.cache[r.cacheKey(req)]; ok {
 		return routeMatch, nil

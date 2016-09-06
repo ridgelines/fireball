@@ -10,22 +10,30 @@ var (
 	JSONHeaders = map[string]string{"Content-Type": "application/json"}
 )
 
+// Context is passed into Handlers
+// It contains fields and helper functions related to the request
 type Context struct {
+	// PathVariables are the URL-related variables returned by the Router
 	PathVariables map[string]string
-	Parser        TemplateParser
-	Request       *http.Request
-	Writer        http.ResponseWriter
-	Meta          map[string]interface{}
+	// Meta can be used to pass information along Decorators
+	Meta map[string]interface{}
+	// Parser is used to render html templates
+	Parser TemplateParser
+	// Request is the originating *http.Request
+	Request *http.Request
+	// Writer is the originating http.ResponseWriter
+	Writer http.ResponseWriter
 }
 
-func (c *Context) HTML(status int, file string, data interface{}) (*HTTPResponse, error) {
+// HTML is a helper function that returns a response generated from the given templateName and data
+func (c *Context) HTML(status int, templateName string, data interface{}) (*HTTPResponse, error) {
 	tmpl, err := c.Parser.Parse()
 	if err != nil {
 		return nil, err
 	}
 
 	var buffer bytes.Buffer
-	if err := tmpl.ExecuteTemplate(&buffer, file, data); err != nil {
+	if err := tmpl.ExecuteTemplate(&buffer, templateName, data); err != nil {
 		return nil, err
 	}
 

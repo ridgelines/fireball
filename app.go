@@ -2,28 +2,28 @@ package fireball
 
 import (
 	"net/http"
-	"sync"
 )
 
+// App is the main structure of fireball applications.
+// It can be invoked as an http.Handler
 type App struct {
-	Parser          TemplateParser
-	Router          Router
-	ErrorHandler    func(http.ResponseWriter, *http.Request, error)
+	// The router is used to match a request to a Handler whenever a request is made
+	Router Router
+	// The ErrorHandler is called whenever a Handler returns a non-nil error
+	ErrorHandler func(http.ResponseWriter, *http.Request, error)
+	// The NotFoundHandler is called whenever the Router returns a nil RouteMatch
 	NotFoundHandler func(http.ResponseWriter, *http.Request)
-	once            sync.Once
+	// The template parser is passed into the Context
+	Parser TemplateParser
 }
 
+// NewApp returns a new App object with all of the default fields
 func NewApp(routes []*Route) *App {
-	parser := &GlobParser{
-		Root: "views/",
-		Glob: "*.html",
-	}
-
 	return &App{
 		ErrorHandler:    DefaultErrorHandler,
 		NotFoundHandler: http.NotFound,
 		Router:          NewBasicRouter(routes),
-		Parser:          parser,
+		Parser:          NewGlobParser("views/", "*.html"),
 	}
 }
 

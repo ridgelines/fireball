@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 )
 
+// NewJSONResponse returns a new HTTPResponse in JSON format
 func NewJSONResponse(status int, data interface{}, headers map[string]string) (*HTTPResponse, error) {
 	if headers == nil {
 		headers = JSONHeaders
@@ -18,6 +19,7 @@ func NewJSONResponse(status int, data interface{}, headers map[string]string) (*
 	return response, nil
 }
 
+// NewJSONError returns a new HTTPError in JSON format
 func NewJSONError(status int, err error, headers map[string]string) (*HTTPError, error) {
 	e := struct {
 		Error string

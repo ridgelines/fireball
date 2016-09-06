@@ -6,20 +6,32 @@ import (
 	"time"
 )
 
+// A Decorator wraps logic around a Handler
 type Decorator func(Handler) Handler
 
+// Decorate is a helper function that decorates each Handler in each Route with the given Decorators
 func Decorate(routes []*Route, decorators ...Decorator) []*Route {
-	for _, decorator := range decorators {
-		for _, route := range routes {
-			for method, handler := range route.Handlers {
-				route.Handlers[method] = decorator(handler)
+	decorated := make([]*Route, len(routes))
+
+	for i, route := range routes {
+		decorated[i] = &Route{
+			Path:     route.Path,
+			Handlers: map[string]Handler{},
+		}
+
+		for method, handler := range route.Handlers {
+			decorated[i].Handlers[method] = handler
+
+			for _, decorator := range decorators {
+				decorated[i].Handlers[method] = decorator(decorated[i].Handlers[method])
 			}
 		}
 	}
 
-	return routes
+	return decorated
 }
 
+// BasicAuthDecorator will add basic authentication using the specified username and password
 func BasicAuthDecorator(username, password string) Decorator {
 	return func(handler Handler) Handler {
 		return func(c *Context) (Response, error) {
@@ -35,6 +47,7 @@ func BasicAuthDecorator(username, password string) Decorator {
 	}
 }
 
+// LogDecorator will log the request's method and url
 func LogDecorator() Decorator {
 	return func(handler Handler) Handler {
 		return func(c *Context) (Response, error) {
@@ -44,8 +57,12 @@ func LogDecorator() Decorator {
 	}
 }
 
-// todo: from gorilla documentation http://www.gorillatoolkit.org/pkg/sessions
-// need use context.ClearHandler: http.ListenAndServe(":8080", context.ClearHandler(http.DefaultServeMux)))
+// SessionDecorator will manage a *gorilla.Session object.
+// The session can be accessed by the "session" key in the Context.Meta field.
+//
+// Note that http://www.gorillatoolkit.org/pkg/sessions requires the use of context.ClearHandler:
+//  app := fireball.NewApp(routes)
+//  http.ListenAndServe(":8000", context.ClearHandler(app))
 func SessionDecorator(store sessions.Store, expiration time.Duration) Decorator {
 	return func(handler Handler) Handler {
 		return func(c *Context) (Response, error) {
