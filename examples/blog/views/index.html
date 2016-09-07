@@ -1,10 +1,83 @@
-<h1>Hello, World!</h1>
+<!doctype html>
+<html>
+{{ template "partials/header" "Blog Example" }}
+<body>
 
-<p>My context is "{{ . }}"</p>
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+        <div class="header">
+            <h1 class="brand-title">A Sample Blog</h1>
+            <h2 class="brand-tagline">A simple blog using Fireball</h2>
 
-<p>Rendering test/index: {{ template "test/index.html" . }}</p>
+            <nav class="nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a class="pure-button" href="http://github.com/zpatrick/fireball">Github</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="pure-button" href="https://godoc.org/github.com/zpatrick/fireball">GoDoc</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
 
-{{ template "my_footer" "test123" }}
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            <!-- A wrapper for all the blog posts -->
+            <div class="posts">
 
-{{ template "my_footer" . }}
+            	{{ with .PinnedPost }} 
+                <h1 class="content-subhead">Pinned Post</h1>
 
+                <!-- A single blog post -->
+                <section class="post">
+                    <header class="post-header">
+                        <img class="post-avatar" alt="avatar" height="48" width="48" src="static/img/avatar.jpg">
+
+                        <h2 class="post-title">{{ .Title }}</h2>
+
+                        <p class="post-meta">
+                            By <a href="#" class="post-author">{{ .Author }}</a> | {{ .Date.Format "Jan 02, 2006" }}
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p>
+                            {{ .Body }}
+                        </p>
+                    </div>
+                </section>
+            </div>
+            {{ end }}
+
+            <div class="posts">
+                <h1 class="content-subhead">Recent Posts</h1>
+
+                {{ range .RecentPosts }}
+                <section class="post">
+                    <header class="post-header">
+                        <img class="post-avatar" alt="avatar" height="48" width="48" src="static/img/avatar.jpg">
+
+                        <h2 class="post-title">{{ .Title }}</h2>
+
+                        <p class="post-meta">
+                            By <a href="#" class="post-author">{{ .Author }}</a> | {{ .Date.Format "Jan 02, 2006" }}
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        <p>
+                            {{ .Body }}
+                        </p>
+                    </div>
+                </section>
+                {{ end }}
+
+            {{ template "partials/footer" }}
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
