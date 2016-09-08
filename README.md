@@ -185,3 +185,8 @@ In addition to Decorators, the [Before](https://godoc.org/github.com/zpatrick/fi
 * [HTML Templates](https://github.com/zpatrick/fireball/tree/master/examples/blog)
 * [TODO:Redirect](#)
 * [TODO: Sessions](#)
+
+# License
+This work is published under the MIT license.
+
+Please see the `LICENSE` file for details.
