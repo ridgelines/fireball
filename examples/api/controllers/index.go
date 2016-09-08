@@ -70,7 +70,6 @@ func (h *IndexController) IndexWithDecorator(c *fireball.Context) (fireball.Resp
 
 	session.Values["count"] = count + 1
 	body := fmt.Sprintf("You have visited this page %d time(s)", session.Values["count"])
-
 	return fireball.NewResponse(200, []byte(body), nil), nil
 }
 

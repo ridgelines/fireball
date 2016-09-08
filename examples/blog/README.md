@@ -1,4 +1,4 @@
-# Hello World
+# Blog
 This example application shows a basic blog implementation using Fireball.
 The following elements are shown here:
 * Serving Static Files

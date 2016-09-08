@@ -176,7 +176,7 @@ Fireball has some built-in decorators:
 * [BasicAuthDecorator](https://godoc.org/github.com/zpatrick/fireball#BasicAuthDecorator) adds basic authentication using a specified username and password
 * [SessionDecorator](https://godoc.org/github.com/zpatrick/fireball#SessionDecorator) manages [gorilla.Session](http://www.gorillatoolkit.org/pkg/sessions#Session) objects
 
-In addition to Decorators, the [Before](https://godoc.org/github.com/zpatrick/fireball#App) and [After](https://godoc.org/github.com/zpatrick/fireball#App) functions can be used to perform some logic f
+In addition to Decorators, the [Before](https://godoc.org/github.com/zpatrick/fireball#App) and [After](https://godoc.org/github.com/zpatrick/fireball#App) functions on the [Application](https://godoc.org/github.com/zpatrick/fireball#App) object can be used to perform logic when the request is received and after the response has been sent. 
 
 # Examples
 * [JSON](https://github.com/zpatrick/fireball/tree/master/examples/api)
