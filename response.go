@@ -10,6 +10,13 @@ type Response interface {
 	Write(http.ResponseWriter, *http.Request)
 }
 
+// ResponseFunc is a function which implements the Response interface
+type ResponseFunc func(http.ResponseWriter, *http.Request)
+
+func (rf ResponseFunc) Write(w http.ResponseWriter, r *http.Request) {
+	rf(w, r)
+}
+
 // HTTPResponse objects write the specified status, headers, and body to
 // a http.ResponseWriter
 type HTTPResponse struct {

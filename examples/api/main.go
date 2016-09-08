@@ -11,23 +11,27 @@ import (
 	"time"
 )
 
-var store = sessions.NewCookieStore([]byte("something-very-secret"))
+var sessionStore = sessions.NewCookieStore([]byte("something-very-secret"))
 
 func main() {
 	file := container.NewStringFileContainer("movies.json", nil)
 	movieStore := stores.NewMovieStore(file)
 
-	indexController := controllers.NewIndexController(store)
+	indexController := controllers.NewIndexController(sessionStore)
 	movieController := controllers.NewMovieController(movieStore)
 
 	routes := fireball.Decorate(
 		append(movieController.Routes(), indexController.Routes()...),
-		fireball.LogDecorator(),
 		fireball.BasicAuthDecorator("user", "pass"),
-		fireball.SessionDecorator(store, time.Minute*1))
+		// todo: remove session decorator to different example (blog, put in username topright corner)
+		fireball.SessionDecorator(sessionStore, time.Minute*1))
 
 	app := fireball.NewApp(routes)
 	app.ErrorHandler = controllers.JSONErrorHandler
+
+	// Note that http://www.gorillatoolkit.org/pkg/sessions requires the use of context.ClearHandler:
+	//  app := fireball.NewApp(routes)
+	//  http.ListenAndServe(":8000", context.ClearHandler(app))
 
 	fmt.Println("Running on port 8000")
 	http.ListenAndServe(":8000", app)

@@ -52,7 +52,7 @@ func (m *MovieController) ListMovies(c *fireball.Context) (fireball.Response, er
 func (m *MovieController) CreateMovie(c *fireball.Context) (fireball.Response, error) {
 	var movie *models.Movie
 	if err := json.NewDecoder(c.Request.Body).Decode(&movie); err != nil {
-		return fireball.NewJSONError(400, err, Headers)
+		return nil, err
 	}
 
 	movie.ID = randomID(5)
@@ -76,8 +76,7 @@ func (m *MovieController) GetMovie(c *fireball.Context) (fireball.Response, erro
 	}
 
 	if movie == nil {
-		err := fmt.Errorf("Movie with id '%s' does not exist", id)
-		return fireball.NewJSONError(400, err, Headers)
+		return nil, fmt.Errorf("Movie with id '%s' does not exist", id)
 	}
 
 	return fireball.NewJSONResponse(200, movie, Headers)
@@ -92,8 +91,7 @@ func (m *MovieController) DeleteMovie(c *fireball.Context) (fireball.Response, e
 	}
 
 	if !existed {
-		err := fmt.Errorf("Movie with id '%s' does not exist", id)
-		return fireball.NewJSONError(400, err, Headers)
+		return nil, fmt.Errorf("Movie with id '%s' does not exist", id)
 	}
 
 	return fireball.NewJSONResponse(200, nil, Headers)

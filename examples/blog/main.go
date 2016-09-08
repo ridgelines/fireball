@@ -3,13 +3,17 @@ package main
 import (
 	"github.com/zpatrick/fireball"
 	"github.com/zpatrick/fireball/examples/blog/controllers"
+	"log"
 	"net/http"
 )
 
 func main() {
-	controller := controllers.NewIndexController()
-	routes := fireball.Decorate(controller.Routes(), fireball.LogDecorator())
+	controller := controllers.NewRootController()
+	routes := fireball.Decorate(controller.Routes(), fireball.BasicAuthDecorator("user", "pass"))
 	app := fireball.NewApp(routes)
+	app.Before = func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("%s %s\n", r.Method, r.URL.String())
+	}
 
 	http.Handle("/", app)
 

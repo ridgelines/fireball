@@ -6,13 +6,13 @@ import (
 	"time"
 )
 
-type IndexController struct{}
+type RootController struct{}
 
-func NewIndexController() *IndexController {
-	return &IndexController{}
+func NewRootController() *RootController {
+	return &RootController{}
 }
 
-func (h *IndexController) Routes() []*fireball.Route {
+func (h *RootController) Routes() []*fireball.Route {
 	routes := []*fireball.Route{
 		{
 			Path: "/",
@@ -25,7 +25,7 @@ func (h *IndexController) Routes() []*fireball.Route {
 	return routes
 }
 
-func (h *IndexController) index(c *fireball.Context) (fireball.Response, error) {
+func (h *RootController) index(c *fireball.Context) (fireball.Response, error) {
 	data := struct {
 		PinnedPost  *models.Post
 		RecentPosts []*models.Post

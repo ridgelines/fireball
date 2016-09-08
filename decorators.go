@@ -2,7 +2,7 @@ package fireball
 
 import (
 	"github.com/gorilla/sessions"
-	"log"
+	"net/http"
 	"time"
 )
 
@@ -47,16 +47,6 @@ func BasicAuthDecorator(username, password string) Decorator {
 	}
 }
 
-// LogDecorator will log the request's method and url
-func LogDecorator() Decorator {
-	return func(handler Handler) Handler {
-		return func(c *Context) (Response, error) {
-			log.Printf("%s %s\n", c.Request.Method, c.Request.URL.String())
-			return handler(c)
-		}
-	}
-}
-
 // SessionDecorator will manage a *gorilla.Session object.
 // The session can be accessed by the "session" key in the Context.Meta field.
 //
@@ -73,8 +63,14 @@ func SessionDecorator(store sessions.Store, expiration time.Duration) Decorator 
 
 			session.Options.MaxAge = int(expiration.Seconds())
 			c.Meta["session"] = session
-			defer session.Save(c.Request, c.Writer)
-			return handler(c)
+
+			response, err := handler(c)
+			var wrappedResponse ResponseFunc = func(w http.ResponseWriter, r *http.Request) {
+				session.Save(r, w)
+				response.Write(w, r)
+			}
+
+			return wrappedResponse, err
 		}
 	}
 }

@@ -22,8 +22,9 @@ type Context struct {
 	Parser TemplateParser
 	// Request is the originating *http.Request
 	Request *http.Request
-	// Writer is the originating http.ResponseWriter
-	Writer http.ResponseWriter
+	// todo: I could add the http.ResponseWriter here, allowing Handlers to write early if they want to
+	// problem is, that kinda of breaks the whole idea of Fireball. You can workaround by returning a ResponseFunc,
+	// But, and the same time, maybe I should be respecting the "we are all adults here" principle.
 }
 
 // HTML is a helper function that returns a response generated from the given templateName and data
