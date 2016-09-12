@@ -13,6 +13,13 @@ type TemplateParser interface {
 	Parse() (*template.Template, error)
 }
 
+// TemplateParserFunc is a function which implements the TemplateParser interface
+type TemplateParserFunc func() (*template.Template, error)
+
+func (tpf TemplateParserFunc) Parse() (*template.Template, error) {
+        return tpf()
+}
+
 // GlobParser generates a template by recusively searching the specified root directory
 // and parses templates that match the specified glob pattern
 type GlobParser struct {

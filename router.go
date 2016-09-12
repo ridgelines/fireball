@@ -11,6 +11,13 @@ type Router interface {
 	Match(*http.Request) (*RouteMatch, error)
 }
 
+// RouterFunc is a function which implements the Router interface
+type RouterFunc func(*http.Request) (*RouteMatch, error)
+
+func (rf RouterFunc) Match(r *http.Request) (*RouteMatch, error) {
+	return rf(r)
+}
+
 // BasicRouter attempts to match requests based on its Routes.
 // This router supports variables in the URL by using "{variable}" notation in URL sections.
 // For example, the following are all valid Paths:
