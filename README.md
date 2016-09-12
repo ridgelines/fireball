@@ -183,7 +183,7 @@ In addition to Decorators, the [Before](https://godoc.org/github.com/zpatrick/fi
 * [Logging](https://github.com/zpatrick/fireball/tree/master/examples/blog)
 * [Authentication](https://github.com/zpatrick/fireball/tree/master/examples/blog)
 * [HTML Templates](https://github.com/zpatrick/fireball/tree/master/examples/blog)
-* [TODO:Redirect](#)
+* [Redirect](https://godoc.org/github.com/zpatrick/fireball#Redirect)
 * [TODO: Sessions](#)
 
 # License
