@@ -17,7 +17,7 @@ type TemplateParser interface {
 type TemplateParserFunc func() (*template.Template, error)
 
 func (tpf TemplateParserFunc) Parse() (*template.Template, error) {
-        return tpf()
+	return tpf()
 }
 
 // GlobParser generates a template by recusively searching the specified root directory

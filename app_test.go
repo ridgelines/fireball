@@ -68,25 +68,25 @@ func TestErrorFromRouterIsHandled(t *testing.T) {
 }
 
 func TestErrorFromHandlerIsHandled(t *testing.T) {
-        var executed bool
+	var executed bool
 
-        app := NewApp(nil)
-        app.Router = RouterFunc(func(*http.Request) (*RouteMatch, error) {
-                handler := func(*Context) (Response, error) {
-                        return nil, errors.New("")
-                }
+	app := NewApp(nil)
+	app.Router = RouterFunc(func(*http.Request) (*RouteMatch, error) {
+		handler := func(*Context) (Response, error) {
+			return nil, errors.New("")
+		}
 
-                return &RouteMatch{Handler: handler}, nil
-        })
+		return &RouteMatch{Handler: handler}, nil
+	})
 
-        app.ErrorHandler = func(http.ResponseWriter, *http.Request, error) {
-                executed = true
-        }
+	app.ErrorHandler = func(http.ResponseWriter, *http.Request, error) {
+		executed = true
+	}
 
-        app.ServeHTTP(httptest.NewRecorder(), newRequest("", ""))
-        if !executed {
-                t.Fail()
-        }
+	app.ServeHTTP(httptest.NewRecorder(), newRequest("", ""))
+	if !executed {
+		t.Fail()
+	}
 }
 
 func TestResponseWriteIsExecuted(t *testing.T) {
