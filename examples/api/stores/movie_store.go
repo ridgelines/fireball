@@ -45,44 +45,26 @@ func (this *MovieStoreInsert) Execute() error {
 	return this.container.Insert(this.table, this.data.ID, bytes)
 }
 
-type MovieStoreSelect struct {
+type MovieStoreSelectAll struct {
 	*MovieStore
-	query  string
 	filter MovieFilter
-	all    bool
 }
 
-func (this *MovieStore) Select(query string) *MovieStoreSelect {
-	return &MovieStoreSelect{
+func (this *MovieStore) SelectAll() *MovieStoreSelectAll {
+	return &MovieStoreSelectAll{
 		MovieStore: this,
-		query:      query,
-	}
-}
-
-func (this *MovieStore) SelectAll() *MovieStoreSelect {
-	return &MovieStoreSelect{
-		MovieStore: this,
-		all:        true,
 	}
 }
 
 type MovieFilter func(*models.Movie) bool
 
-func (this *MovieStoreSelect) Where(filter MovieFilter) *MovieStoreSelect {
+func (this *MovieStoreSelectAll) Where(filter MovieFilter) *MovieStoreSelectAll {
 	this.filter = filter
 	return this
 }
 
-func (this *MovieStoreSelect) Execute() ([]*models.Movie, error) {
-	var query func() (map[string][]byte, error)
-
-	if this.all {
-		query = func() (map[string][]byte, error) { return this.container.SelectAll(this.table) }
-	} else {
-		query = func() (map[string][]byte, error) { return this.container.Select(this.table, this.query) }
-	}
-
-	data, err := query()
+func (this *MovieStoreSelectAll) Execute() ([]*models.Movie, error) {
+	data, err := this.container.SelectAll(this.table)
 	if err != nil {
 		return nil, err
 	}
@@ -104,17 +86,17 @@ func (this *MovieStoreSelect) Execute() ([]*models.Movie, error) {
 }
 
 type MovieStoreSelectFirst struct {
-	*MovieStoreSelect
+	*MovieStoreSelectAll
 }
 
-func (this *MovieStoreSelect) FirstOrNil() *MovieStoreSelectFirst {
+func (this *MovieStoreSelectAll) FirstOrNil() *MovieStoreSelectFirst {
 	return &MovieStoreSelectFirst{
-		MovieStoreSelect: this,
+		MovieStoreSelectAll: this,
 	}
 }
 
 func (this *MovieStoreSelectFirst) Execute() (*models.Movie, error) {
-	results, err := this.MovieStoreSelect.Execute()
+	results, err := this.MovieStoreSelectAll.Execute()
 	if err != nil {
 		return nil, err
 	}
