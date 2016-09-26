@@ -41,7 +41,7 @@ func TestMethodMatch(t *testing.T) {
 		}
 
 		if match == nil {
-			t.Fatal("Match was nil")
+			t.Errorf("Error on method '%s': Match was nil", method)
 		}
 	}
 }
@@ -121,7 +121,7 @@ func TestNilMatch(t *testing.T) {
 		}
 
 		if match != nil {
-			t.Error("Match was not nil")
+			t.Errorf("Error on Route '%s %s': Match was not nil", testCase.Route.Path)
 		}
 	}
 }
