@@ -1,7 +1,6 @@
 package fireball
 
 import (
-	"bytes"
 	"net/http"
 )
 
@@ -22,23 +21,10 @@ type Context struct {
 	Parser TemplateParser
 	// Request is the originating *http.Request
 	Request *http.Request
-	// todo: I could add the http.ResponseWriter here, allowing Handlers to write early if they want to
-	// problem is, that kinda of breaks the whole idea of Fireball. You can workaround by returning a ResponseFunc,
-	// But, and the same time, maybe I should be respecting the "we are all adults here" principle.
 }
 
-// HTML is a helper function that returns a response generated from the given templateName and data
+// Context.HTML calls HTML with the Context's template parser
 func (c *Context) HTML(status int, templateName string, data interface{}) (*HTTPResponse, error) {
-	tmpl, err := c.Parser.Parse()
-	if err != nil {
-		return nil, err
-	}
-
-	var buffer bytes.Buffer
-	if err := tmpl.ExecuteTemplate(&buffer, templateName, data); err != nil {
-		return nil, err
-	}
-
-	response := NewResponse(status, buffer.Bytes(), HTMLHeaders)
-	return response, nil
+	return HTML(c.Parser, status, templateName, data)
 }
+

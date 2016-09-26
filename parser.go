@@ -1,6 +1,7 @@
 package fireball
 
 import (
+	"bytes"
 	"fmt"
 	"html/template"
 	"os"
@@ -90,4 +91,20 @@ func (p *GlobParser) generateTemplateName(path string, t *template.Template) str
 	path = fmt.Sprintf("%s/%s", path, t.Name())
 	name := strings.TrimPrefix(path, p.Root)
 	return name
+}
+
+// HTML is a helper function that returns a response generated from the given templateName and data
+func HTML(parser TemplateParser, status int, templateName string, data interface{}) (*HTTPResponse, error) {
+        tmpl, err := parser.Parse()
+        if err != nil {
+                return nil, err
+        }
+
+        var buffer bytes.Buffer
+        if err := tmpl.ExecuteTemplate(&buffer, templateName, data); err != nil {
+                return nil, err
+        }
+
+        response := NewResponse(status, buffer.Bytes(), HTMLHeaders)
+        return response, nil
 }
