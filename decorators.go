@@ -20,11 +20,11 @@ func Decorate(routes []*Route, decorators ...Decorator) []*Route {
 		}
 
 		for method, handler := range route.Handlers {
-			decorated[i].Handlers[method] = handler
-
 			for _, decorator := range decorators {
-				decorated[i].Handlers[method] = decorator(decorated[i].Handlers[method])
+				handler = decorator(handler)
 			}
+
+			decorated[i].Handlers[method] = handler
 		}
 	}
 
