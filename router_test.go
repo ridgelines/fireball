@@ -121,7 +121,7 @@ func TestNilMatch(t *testing.T) {
 		}
 
 		if match != nil {
-			t.Errorf("Error on Route '%s %s': Match was not nil", testCase.Route.Path)
+			t.Errorf("Error on Route '%s': Match was not nil", testCase.Route.Path)
 		}
 	}
 }
