@@ -25,6 +25,7 @@ func (tpf TemplateParserFunc) Parse() (*template.Template, error) {
 type GlobParser struct {
 	Root string
 	Glob string
+	cache *template.Template
 }
 
 // NewGlobParser returns a GlobParser with the specified root and glob pattern
@@ -50,6 +51,10 @@ func NewGlobParser(root, glob string) *GlobParser {
 //    "index.html"
 //    "partials/login.html"
 func (p *GlobParser) Parse() (*template.Template, error) {
+        if p.cache != nil {
+		return p.cache, nil
+  	}
+
 	root := template.New("root")
 
 	walkf := func(path string, info os.FileInfo, err error) error {
@@ -76,6 +81,7 @@ func (p *GlobParser) Parse() (*template.Template, error) {
 		return nil, err
 	}
 
+	p.cache = root
 	return root, nil
 }
 

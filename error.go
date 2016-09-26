@@ -32,6 +32,5 @@ func DefaultErrorHandler(w http.ResponseWriter, r *http.Request, err error) {
 		return
 	}
 
-	w.WriteHeader(http.StatusInternalServerError)
-	w.Write([]byte(err.Error()))
+	http.Error(w, err.Error(), http.StatusInternalServerError)
 }

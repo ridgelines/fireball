@@ -2,6 +2,7 @@ package fireball
 
 import (
 	"net/http"
+	"log"
 )
 
 // Response is an object that writes to an http.ResponseWriter
@@ -41,5 +42,8 @@ func (h *HTTPResponse) Write(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(h.Status)
-	w.Write(h.Body)
+	if _, err := w.Write(h.Body); err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
