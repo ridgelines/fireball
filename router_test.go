@@ -63,14 +63,14 @@ func TestPathVariableMatch(t *testing.T) {
 			PathVariables: map[string]string{},
 		},
 		{
-			Route:   newRouteWithNilHandler("GET", "/items/{itemID}"),
+			Route:   newRouteWithNilHandler("GET", "/items/:itemID"),
 			Request: newRequest("GET", "/items/item34"),
 			PathVariables: map[string]string{
 				"itemID": "item34",
 			},
 		},
 		{
-			Route:   newRouteWithNilHandler("GET", "/items/{itemID}/{count}"),
+			Route:   newRouteWithNilHandler("GET", "/items/:itemID/:count"),
 			Request: newRequest("GET", "/items/item34/83"),
 			PathVariables: map[string]string{
 				"itemID": "item34",
@@ -107,7 +107,7 @@ func TestNilMatch(t *testing.T) {
 			Request: newRequest("GET", "/itemss"),
 		},
 		{
-			Route:   newRouteWithNilHandler("GET", "/items/{itemID}"),
+			Route:   newRouteWithNilHandler("GET", "/items/:itemID"),
 			Request: newRequest("GET", "/items/item34/other"),
 		},
 	}

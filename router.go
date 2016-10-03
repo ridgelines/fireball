@@ -19,11 +19,11 @@ func (rf RouterFunc) Match(r *http.Request) (*RouteMatch, error) {
 }
 
 // BasicRouter attempts to match requests based on its Routes.
-// This router supports variables in the URL by using "{variable}" notation in URL sections.
+// This router supports variables in the URL by using ":variable" notation in URL sections.
 // For example, the following are all valid Paths:
 //  "/home"
-//  "/movies/{id}"
-//  "/users/{userID}/purchases/{purchaseID}"
+//  "/movies/:id"
+//  "/users/:userID/purchases/:purchaseID"
 // Matched Path Variables can be retrieved in Handlers by the Context:
 //  func Handler(c *Context) (Response, error) {
 //      id := c.PathVariables["id"]
@@ -94,8 +94,8 @@ func (r *BasicRouter) matchPathVariables(route *Route, url string) (map[string]s
 	for i, routeSection := range routeSections {
 		urlSection := urlSections[i]
 
-		if strings.HasPrefix(routeSection, "{") && strings.HasSuffix(routeSection, "}") {
-			key := routeSection[1 : len(routeSection)-1]
+		if strings.HasPrefix(routeSection, ":") {
+			key := routeSection[1:]
 			variables[key] = urlSection
 		} else if routeSection != urlSection {
 			return nil, false

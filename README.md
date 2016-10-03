@@ -6,7 +6,7 @@
 
 
 ## Overview
-Fireball is a micro web framework written in Go. 
+Fireball is a web framework written in Go. 
 Unlike many web frameworks written in Go, handlers in Fireball applications return objects instead instead of writing them directly to a http.ResponseWriter. 
 This aims to make handlers feel more like "regular" Go functions and push some of the tediousness of the http layer away from business logic.
 
@@ -100,13 +100,13 @@ By default, Fireball uses the [BasicRouter](https://godoc.org/github.com/zpatric
 The Route's Path field determines which URL patterns should be dispached to your Route. 
 The Route's Handlers field maps different HTTP methods to different [Handlers](https://godoc.org/github.com/zpatrick/fireball#Handler).
 
-You can use `{variable}` blocks in the Path to match any string that doesn't contain a `"/"` character.
+You can use `:variable` notation in the Path to match any string that doesn't contain a `"/"` character.
 The variables defined in the Route's Path field can be accessed using the [Context](https://godoc.org/github.com/zpatrick/fireball#Context) object.
 
 Example:
 ```
 route := &Fireball.Route{
-  Path: "/users/{userID}/orders/{orderID}",
+  Path: "/users/:userID/orders/:orderID",
   Methods: map[string]fireball.Handler{
     "GET": printUserOrder,
   },

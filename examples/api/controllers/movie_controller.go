@@ -29,7 +29,7 @@ func (m *MovieController) Routes() []*fireball.Route {
 			},
 		},
 		{
-			Path: "/movies/{id}",
+			Path: "/movies/:id",
 			Handlers: map[string]fireball.Handler{
 				"GET":    m.GetMovie,
 				"DELETE": m.DeleteMovie,
