@@ -7,9 +7,7 @@
 
 ## Overview
 Fireball is a web framework written in Go. 
-It aims to make handlers feel more like "regular" Go functions by: 
-* Moving the response-writing responsibility away from the handler
-* Allowing errors to be bubbled up 
+It aims to make handlers feel more like "regular" Go functions by moving the response-writing responsibility away from the handler and allowing errors to be bubbled up to a single error handler.
 
 ## Installation
 To install this package, run:
