@@ -180,9 +180,9 @@ Fireball has some built-in decorators:
 In addition to Decorators, the [Before](https://godoc.org/github.com/zpatrick/fireball#App) and [After](https://godoc.org/github.com/zpatrick/fireball#App) functions on the [Application](https://godoc.org/github.com/zpatrick/fireball#App) object can be used to perform logic when the request is received and after the response has been sent. 
 
 # Examples & Extras
-* [JSON](https://github.com/zpatrick/fireball/tree/master/examples/api)
-* [Logging](https://github.com/zpatrick/fireball/tree/master/examples/blog/main.go)
-* [Authentication](https://github.com/zpatrick/fireball/tree/master/examples/blog/main.go#L12)
+* [JSON](https://github.com/zpatrick/fireball/blob/master/examples/api/controllers/movie_controller.go#L49)
+* [Logging](https://github.com/zpatrick/fireball/tree/master/examples/blog/main.go#L15)
+* [Authentication](https://github.com/zpatrick/fireball/tree/master/examples/blog/main.go#L14)
 * [HTML Templates](https://github.com/zpatrick/fireball/blob/master/examples/blog/controllers/root_controller.go#L71)
 * [Redirect](https://godoc.org/github.com/zpatrick/fireball#Redirect)
 
