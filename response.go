@@ -1,8 +1,8 @@
 package fireball
 
 import (
-	"net/http"
 	"log"
+	"net/http"
 )
 
 // Response is an object that writes to an http.ResponseWriter

@@ -24,8 +24,8 @@ func (tpf TemplateParserFunc) Parse() (*template.Template, error) {
 // GlobParser generates a template by recusively searching the specified root directory
 // and parses templates that match the specified glob pattern
 type GlobParser struct {
-	Root string
-	Glob string
+	Root  string
+	Glob  string
 	cache *template.Template
 }
 
@@ -52,13 +52,17 @@ func NewGlobParser(root, glob string) *GlobParser {
 //    "index.html"
 //    "partials/login.html"
 func (p *GlobParser) Parse() (*template.Template, error) {
-        if p.cache != nil {
+	if p.cache != nil {
 		return p.cache, nil
-  	}
+	}
 
 	root := template.New("root")
 
 	walkf := func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
 		if info.IsDir() {
 			path = filepath.Join(path, p.Glob)
 			current, err := template.ParseGlob(path)
@@ -95,16 +99,16 @@ func (p *GlobParser) generateTemplateName(path string, t *template.Template) str
 
 // HTML is a helper function that returns a response generated from the given templateName and data
 func HTML(parser TemplateParser, status int, templateName string, data interface{}) (*HTTPResponse, error) {
-        tmpl, err := parser.Parse()
-        if err != nil {
-                return nil, err
-        }
+	tmpl, err := parser.Parse()
+	if err != nil {
+		return nil, err
+	}
 
-        var buffer bytes.Buffer
-        if err := tmpl.ExecuteTemplate(&buffer, templateName, data); err != nil {
-                return nil, err
-        }
+	var buffer bytes.Buffer
+	if err := tmpl.ExecuteTemplate(&buffer, templateName, data); err != nil {
+		return nil, err
+	}
 
-        response := NewResponse(status, buffer.Bytes(), HTMLHeaders)
-        return response, nil
+	response := NewResponse(status, buffer.Bytes(), HTMLHeaders)
+	return response, nil
 }

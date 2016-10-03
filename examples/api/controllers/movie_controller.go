@@ -46,7 +46,7 @@ func (m *MovieController) ListMovies(c *fireball.Context) (fireball.Response, er
 		return nil, err
 	}
 
-	return fireball.NewJSONResponse(200, movies, Headers)
+	return fireball.NewJSONResponse(200, movies)
 }
 
 func (m *MovieController) CreateMovie(c *fireball.Context) (fireball.Response, error) {
@@ -60,7 +60,7 @@ func (m *MovieController) CreateMovie(c *fireball.Context) (fireball.Response, e
 		return nil, err
 	}
 
-	return fireball.NewJSONResponse(200, movie, Headers)
+	return fireball.NewJSONResponse(200, movie)
 }
 
 func (m *MovieController) GetMovie(c *fireball.Context) (fireball.Response, error) {
@@ -79,7 +79,7 @@ func (m *MovieController) GetMovie(c *fireball.Context) (fireball.Response, erro
 		return nil, fmt.Errorf("Movie with id '%s' does not exist", id)
 	}
 
-	return fireball.NewJSONResponse(200, movie, Headers)
+	return fireball.NewJSONResponse(200, movie)
 }
 
 func (m *MovieController) DeleteMovie(c *fireball.Context) (fireball.Response, error) {
@@ -94,7 +94,7 @@ func (m *MovieController) DeleteMovie(c *fireball.Context) (fireball.Response, e
 		return nil, fmt.Errorf("Movie with id '%s' does not exist", id)
 	}
 
-	return fireball.NewJSONResponse(200, nil, Headers)
+	return fireball.NewJSONResponse(200, nil)
 }
 
 const runes = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"

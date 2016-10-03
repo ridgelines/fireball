@@ -2,6 +2,7 @@ package fireball
 
 import (
 	"github.com/gorilla/sessions"
+	"log"
 	"net/http"
 	"time"
 )
@@ -29,6 +30,16 @@ func Decorate(routes []*Route, decorators ...Decorator) []*Route {
 	}
 
 	return decorated
+}
+
+// LogDecorator will print the method and url of each request
+func LogDecorator() Decorator {
+	return func(handler Handler) Handler {
+		return func(c *Context) (Response, error) {
+			log.Printf("%s %s \n", c.Request.Method, c.Request.URL.String())
+			return handler(c)
+		}
+	}
 }
 
 // BasicAuthDecorator will add basic authentication using the specified username and password

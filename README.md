@@ -174,17 +174,17 @@ func Index(c *fireball.Context) (fireball.Response, error) {
 [Decorators](https://godoc.org/github.com/zpatrick/fireball#Decorator) can be used to wrap additional logic around [Handlers](https://godoc.org/github.com/zpatrick/fireball#Handler). 
 Fireball has some built-in decorators:
 * [BasicAuthDecorator](https://godoc.org/github.com/zpatrick/fireball#BasicAuthDecorator) adds basic authentication using a specified username and password
+* [LogDecorator](https://godoc.org/github.com/zpatrick/fireball#LogDecorator) logs incoming requests
 * [SessionDecorator](https://godoc.org/github.com/zpatrick/fireball#SessionDecorator) manages [gorilla.Session](http://www.gorillatoolkit.org/pkg/sessions#Session) objects
 
 In addition to Decorators, the [Before](https://godoc.org/github.com/zpatrick/fireball#App) and [After](https://godoc.org/github.com/zpatrick/fireball#App) functions on the [Application](https://godoc.org/github.com/zpatrick/fireball#App) object can be used to perform logic when the request is received and after the response has been sent. 
 
-# Examples
+# Examples & Extras
 * [JSON](https://github.com/zpatrick/fireball/tree/master/examples/api)
-* [Logging](https://github.com/zpatrick/fireball/tree/master/examples/blog)
-* [Authentication](https://github.com/zpatrick/fireball/tree/master/examples/blog)
-* [HTML Templates](https://github.com/zpatrick/fireball/tree/master/examples/blog)
+* [Logging](https://github.com/zpatrick/fireball/tree/master/examples/blog/main.go)
+* [Authentication](https://github.com/zpatrick/fireball/tree/master/examples/blog/main.go#L12)
+* [HTML Templates](https://github.com/zpatrick/fireball/blob/master/examples/blog/controllers/root_controller.go#L71)
 * [Redirect](https://godoc.org/github.com/zpatrick/fireball#Redirect)
-* [TODO: Sessions](#)
 
 # License
 This work is published under the MIT license.

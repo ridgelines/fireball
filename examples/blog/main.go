@@ -9,16 +9,16 @@ import (
 
 func main() {
 	controller := controllers.NewRootController()
-	routes := fireball.Decorate(controller.Routes(), fireball.BasicAuthDecorator("user", "pass"))
-	app := fireball.NewApp(routes)
-	app.Before = func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("%s %s\n", r.Method, r.URL.String())
-	}
+	routes := fireball.Decorate(
+		controller.Routes(),
+		fireball.BasicAuthDecorator("user", "pass"),
+		fireball.LogDecorator())
 
+	app := fireball.NewApp(routes)
 	http.Handle("/", app)
 
 	fs := http.FileServer(http.Dir("static"))
 	http.Handle("/static/", http.StripPrefix("/static", fs))
 
-	http.ListenAndServe(":80", nil)
+	log.Fatal(http.ListenAndServe(":80", nil))
 }

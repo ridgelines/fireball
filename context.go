@@ -27,4 +27,3 @@ type Context struct {
 func (c *Context) HTML(status int, templateName string, data interface{}) (*HTTPResponse, error) {
 	return HTML(c.Parser, status, templateName, data)
 }
-
