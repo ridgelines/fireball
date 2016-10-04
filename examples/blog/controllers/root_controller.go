@@ -16,7 +16,7 @@ func (h *RootController) Routes() []*fireball.Route {
 	routes := []*fireball.Route{
 		{
 			Path: "/",
-			Handlers: map[string]fireball.Handler{
+			Handlers: fireball.Handlers{
 				"GET": h.index,
 			},
 		},

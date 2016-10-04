@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"github.com/zpatrick/fireball"
 	"github.com/zpatrick/fireball/examples/api/controllers"
 	"github.com/zpatrick/fireball/examples/api/stores"
 	"github.com/zpatrick/go-sdata/container"
+	"log"
 	"net/http"
 )
 
@@ -22,6 +22,6 @@ func main() {
 	app := fireball.NewApp(routes)
 	app.ErrorHandler = controllers.JSONErrorHandler
 
-	fmt.Println("Running on port 8000")
-	http.ListenAndServe(":8000", app)
+	log.Println("Running on port 8000")
+	log.Fatal(http.ListenAndServe(":8000", app))
 }

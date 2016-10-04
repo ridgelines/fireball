@@ -32,7 +32,7 @@ func index(c *fireball.Context) (fireball.Response, error) {
 func main() {
   indexRoute := &fireball.Route{
     Path: "/",
-    Handlers: map[string]fireball.Handler{
+    Handlers: fireball.Handlers{
       "GET": index,
     },
   }
@@ -106,7 +106,7 @@ Example:
 ```
 route := &Fireball.Route{
   Path: "/users/:userID/orders/:orderID",
-  Methods: map[string]fireball.Handler{
+  Methods: fireball.Handlers{
     "GET": printUserOrder,
   },
 }

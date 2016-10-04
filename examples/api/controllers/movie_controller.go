@@ -23,14 +23,14 @@ func (m *MovieController) Routes() []*fireball.Route {
 	routes := []*fireball.Route{
 		{
 			Path: "/movies",
-			Handlers: map[string]fireball.Handler{
+			Handlers: fireball.Handlers{
 				"GET":  m.ListMovies,
 				"POST": m.CreateMovie,
 			},
 		},
 		{
 			Path: "/movies/:id",
-			Handlers: map[string]fireball.Handler{
+			Handlers: fireball.Handlers{
 				"GET":    m.GetMovie,
 				"DELETE": m.DeleteMovie,
 			},
