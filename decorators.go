@@ -85,3 +85,23 @@ func SessionDecorator(store sessions.Store, expiration time.Duration) Decorator 
 		}
 	}
 }
+
+// HeaderResponseDecorator will add the specified headers to each response
+func HeaderResponseDecorator(headers map[string]string) Decorator {
+	return func(handler Handler) Handler {
+		return func(c *Context) (Response, error) {
+			response, err := handler(c)
+			var wrappedResponse ResponseFunc = func(w http.ResponseWriter, r *http.Request) {
+				for key, val := range headers {
+					if v := w.Header().Get(key); v == "" {
+						w.Header().Set(key, val)
+					}
+				}
+
+				response.Write(w, r)
+			}
+
+			return wrappedResponse, err
+		}
+	}
+}

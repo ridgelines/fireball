@@ -8,6 +8,10 @@ var (
 	HTMLHeaders = map[string]string{"Content-Type": "text/html"}
 	JSONHeaders = map[string]string{"Content-Type": "application/json"}
 	TextHeaders = map[string]string{"Content-Type": "text/plain"}
+	CORSHeaders = map[string]string{
+		"Access-Control-Allow-Origin":  "*",
+		"Access-Control-Allow-Headers": "*",
+	}
 )
 
 // Context is passed into Handlers
