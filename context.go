@@ -11,6 +11,7 @@ var (
 	CORSHeaders = map[string]string{
 		"Access-Control-Allow-Origin":  "*",
 		"Access-Control-Allow-Headers": "*",
+		"Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, COPY, HEAD, OPTIONS, LINK, UNLINK, CONNECT, TRACE, PURGE",
 	}
 )
 
