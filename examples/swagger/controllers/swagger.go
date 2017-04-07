@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/zpatrick/fireball"
+	"github.com/zpatrick/fireball/examples/swagger/models"
 	"github.com/zpatrick/go-plugin-swagger"
 )
 
@@ -71,7 +72,7 @@ func (s *SwaggerController) getSwaggerSpec(c *fireball.Context) (fireball.Respon
 					Parameters: []swagger.Parameter{
 						swagger.NewIntPathParam("count", "some description", true),
 						swagger.NewStringPathParam("name", "some description", true),
-						swagger.NewBodyParam(true, models.Movie{})
+						swagger.NewBodyParam("Movie", "description of movie", true),
 					},
 					Responses: map[string]swagger.Response{
 						"200": {
@@ -83,6 +84,10 @@ func (s *SwaggerController) getSwaggerSpec(c *fireball.Context) (fireball.Respon
 					},
 				},
 			},
+		},
+		Definitions: map[string]swagger.Definition{
+			"Movie":   models.Movie{}.Definition(),
+			"Contact": models.Contact{}.Definition(),
 		},
 	}
 

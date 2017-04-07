@@ -9,9 +9,10 @@ var (
 	JSONHeaders = map[string]string{"Content-Type": "application/json"}
 	TextHeaders = map[string]string{"Content-Type": "text/plain"}
 	CORSHeaders = map[string]string{
-		"Access-Control-Allow-Origin":  "*",
-		"Access-Control-Allow-Headers": "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers",
-		"Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, COPY, HEAD, OPTIONS, LINK, UNLINK, CONNECT, TRACE, PURGE",
+		"Access-Control-Allow-Origin":      "*",
+		"Access-Control-Allow-Credentials": "true",
+		"Access-Control-Allow-Headers":     "Authorization, Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers",
+		"Access-Control-Allow-Methods":     "GET, POST, PUT, PATCH, DELETE, COPY, HEAD, OPTIONS, LINK, UNLINK, CONNECT, TRACE, PURGE",
 	}
 )
 
