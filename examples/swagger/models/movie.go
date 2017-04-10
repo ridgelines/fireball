@@ -5,24 +5,16 @@ import (
 )
 
 type Movie struct {
-	Title      string
-	Year       int
-	InTheaters bool
-	Cast       []string
-	Director   Contact
-	Crew       []Contact
+	Title string `json:"title"`
+	Year  int    `json:"year"`
 }
 
-func (Movie) Definition() swagger.Definition {
+func (m Movie) Definition() swagger.Definition {
 	return swagger.Definition{
 		Type: "object",
 		Properties: map[string]swagger.Property{
-			"title":       swagger.NewStringProperty(),
-			"year":        swagger.NewIntProperty(),
-			"in_theaters": swagger.NewBoolProperty(),
-			"cast":        swagger.NewStringSliceProperty(),
-			"directory":   swagger.NewObjectProperty("Contact"),
-			"crew":        swagger.NewObjectSliceProperty("Contact"),
+			"title": swagger.NewStringProperty(),
+			"year":  swagger.NewIntProperty(),
 		},
 	}
 }

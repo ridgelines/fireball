@@ -1,15 +1,12 @@
 package controllers
 
 import (
-	"encoding/json"
-	"fmt"
 	"github.com/zpatrick/fireball"
 	"github.com/zpatrick/fireball/examples/swagger/models"
 	"github.com/zpatrick/go-plugin-swagger"
 )
 
-type SwaggerController struct {
-}
+type SwaggerController struct{}
 
 func NewSwaggerController() *SwaggerController {
 	return &SwaggerController{}
@@ -18,15 +15,9 @@ func NewSwaggerController() *SwaggerController {
 func (s *SwaggerController) Routes() []*fireball.Route {
 	routes := []*fireball.Route{
 		{
-			Path: "/api",
+			Path: "/swagger.json",
 			Handlers: fireball.Handlers{
-				"GET": s.swaggerUIRedirect,
-			},
-		},
-		{
-			Path: "/api/spec.json",
-			Handlers: fireball.Handlers{
-				"GET": s.getSwaggerSpec,
+				"GET": s.ServeSwaggerSpec,
 			},
 		},
 	}
@@ -34,67 +25,78 @@ func (s *SwaggerController) Routes() []*fireball.Route {
 	return routes
 }
 
-func (s *SwaggerController) swaggerUIRedirect(c *fireball.Context) (fireball.Response, error) {
-	redirectPath := fmt.Sprintf("/static/swagger?url=%s/docs.json", c.Request.URL.String())
-	return fireball.Redirect(301, redirectPath), nil
-}
-
-func (s *SwaggerController) getSwaggerSpec(c *fireball.Context) (fireball.Response, error) {
+func (s *SwaggerController) ServeSwaggerSpec(c *fireball.Context) (fireball.Response, error) {
 	spec := swagger.Spec{
 		SwaggerVersion: "2.0",
-		Schemes:        []string{"https"},
-		Info: swagger.Info{
-			Title:          "title",
-			Version:        "1.0.0",
-			TermsOfService: "tos",
-			Contact: swagger.Contact{
-				Name:  "First Last",
-				Email: "first_last@email.com",
-				URL:   "http://url.domain.com",
-			},
-			License: swagger.License{
-				Name: "MIT",
-				URL:  "http://url.domain.com",
-			},
+		Schemes:        []string{"http"},
+		Info: &swagger.Info{
+			Title:   "Swagger Example",
+			Version: "0.0.1",
+		},
+		Definitions: map[string]swagger.Definition{
+			"Movie": models.Movie{}.Definition(),
 		},
 		Tags: []swagger.Tag{
 			{
-				Name:         "movies",
-				Description:  "api calls about movies",
-				ExternalDocs: swagger.ExternalDocs{},
+				Name:        "Movies",
+				Description: "Methods related to movies",
 			},
 		},
 		Paths: map[string]swagger.Path{
 			"/movies": map[string]swagger.Method{
+				"get": {
+					Summary: "List all Movies",
+					Tags:    []string{"Movies"},
+					Responses: map[string]swagger.Response{
+						"200": {
+							Description: "An array of movies",
+							Schema:      swagger.NewObjectSliceSchema("Movie"),
+						},
+					},
+				},
 				"post": {
-					Summary:     "Create a Movie",
-					Description: "SLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+					Summary: "Add a Movie",
+					Tags:    []string{"Movies"},
 					Parameters: []swagger.Parameter{
-						swagger.NewIntPathParam("count", "some description", true),
-						swagger.NewStringPathParam("name", "some description", true),
-						swagger.NewBodyParam("Movie", "description of movie", true),
+						swagger.NewBodyParam("Movie", "Movie to add", true),
 					},
 					Responses: map[string]swagger.Response{
 						"200": {
-							Description: "Successful Operation",
-						},
-						"400": {
-							Description: "Invalid Request",
+							Description: "The added movie",
+							Schema:      swagger.NewObjectSchema("Movie"),
 						},
 					},
 				},
 			},
-		},
-		Definitions: map[string]swagger.Definition{
-			"Movie":   models.Movie{}.Definition(),
-			"Contact": models.Contact{}.Definition(),
+			"/movies/{title}": map[string]swagger.Method{
+				 "get": {
+                                        Summary: "Describe a Movie",
+                                        Tags:    []string{"Movies"},
+					 Parameters: []swagger.Parameter{
+                                                swagger.NewStringPathParam("title", "Title of the movie to describe", true),
+                                        },
+                                        Responses: map[string]swagger.Response{
+                                                "200": {
+                                                        Description: "The desired movie",
+                                                        Schema:      swagger.NewObjectSchema("Movie"),
+                                                },
+                                        },
+                                },
+                                "delete": {
+                                        Summary: "Delete a Movie",
+                                        Tags:    []string{"Movies"},
+                                        Parameters: []swagger.Parameter{
+                                        	 swagger.NewStringPathParam("title", "Title of the movie to delete", true),
+					},
+                                        Responses: map[string]swagger.Response{
+                                                "200": {
+                                                        Description: "Success",
+                                                },
+                                        },
+                                },
+			},
 		},
 	}
 
-	bytes, err := json.MarshalIndent(spec, "", "    ")
-	if err != nil {
-		return nil, err
-	}
-
-	return fireball.NewResponse(200, bytes, fireball.JSONHeaders), nil
+	return fireball.NewJSONResponse(200, spec)
 }

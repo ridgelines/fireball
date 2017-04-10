@@ -7,21 +7,29 @@ import (
 	"net/http"
 )
 
+const (
+	SWAGGER_URL     = "/api/"
+	SWAGGER_UI_PATH = "static/swagger-ui/dist"
+)
+
+func serveSwaggerUI(w http.ResponseWriter, r *http.Request) {
+	dir := http.Dir(SWAGGER_UI_PATH)
+	fileServer := http.FileServer(dir)
+	http.StripPrefix(SWAGGER_URL, fileServer).ServeHTTP(w, r)
+}
+
 func main() {
-	// serve swagger ui from /api
-	fs := http.FileServer(http.Dir("static"))
-	http.Handle("/static/", http.StripPrefix("/static", fs))
+	http.HandleFunc(SWAGGER_URL, serveSwaggerUI)
 
 	routes := controllers.NewSwaggerController().Routes()
+	routes = append(routes, controllers.NewMovieController().Routes()...)
+	routes = fireball.Decorate(routes,
+		fireball.BasicAuthDecorator("user", "pass"),
+		fireball.LogDecorator())
+
 	app := fireball.NewApp(routes)
 	http.Handle("/", app)
 
-	/*
-	   fs := http.FileServer(http.Dir("static"))
-	   http.Handle("/static/", http.StripPrefix("/static", fs))
-	*/
-
 	log.Println("Running on port 9090")
 	log.Fatal(http.ListenAndServe(":9090", nil))
-
 }
