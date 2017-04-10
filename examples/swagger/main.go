@@ -24,7 +24,6 @@ func main() {
 	routes := controllers.NewSwaggerController().Routes()
 	routes = append(routes, controllers.NewMovieController().Routes()...)
 	routes = fireball.Decorate(routes,
-		fireball.BasicAuthDecorator("user", "pass"),
 		fireball.LogDecorator())
 
 	app := fireball.NewApp(routes)
