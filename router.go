@@ -83,6 +83,10 @@ func (r *BasicRouter) matchPathVariables(route *Route, url string) (map[string]s
 		url = strings.TrimSuffix(url, "/")
 	}
 
+	if route.Path != "/" {
+		route.Path =  strings.TrimSuffix(route.Path, "/")
+	}
+
 	routeSections := strings.Split(route.Path, "/")
 	urlSections := strings.Split(url, "/")
 
