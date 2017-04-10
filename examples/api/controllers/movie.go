@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/zpatrick/fireball"
-	"github.com/zpatrick/fireball/examples/swagger/models"
+	"github.com/zpatrick/fireball/examples/api/models"
 )
 
 type MovieController struct {
