@@ -65,7 +65,7 @@ func (r *BasicRouter) matchRoute(route *Route, req *http.Request) *RouteMatch {
 		return nil
 	}
 
-	pathVariables, ok := r.matchPathVariables(route, req.URL.RawPath)
+	pathVariables, ok := r.matchPathVariables(route, req.URL.Path)
 	if !ok {
 		return nil
 	}
