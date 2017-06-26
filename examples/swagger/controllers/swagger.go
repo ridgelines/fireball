@@ -69,31 +69,31 @@ func (s *SwaggerController) ServeSwaggerSpec(c *fireball.Context) (fireball.Resp
 				},
 			},
 			"/movies/{title}": map[string]swagger.Method{
-				 "get": {
-                                        Summary: "Describe a Movie",
-                                        Tags:    []string{"Movies"},
-					 Parameters: []swagger.Parameter{
-                                                swagger.NewStringPathParam("title", "Title of the movie to describe", true),
-                                        },
-                                        Responses: map[string]swagger.Response{
-                                                "200": {
-                                                        Description: "The desired movie",
-                                                        Schema:      swagger.NewObjectSchema("Movie"),
-                                                },
-                                        },
-                                },
-                                "delete": {
-                                        Summary: "Delete a Movie",
-                                        Tags:    []string{"Movies"},
-                                        Parameters: []swagger.Parameter{
-                                        	 swagger.NewStringPathParam("title", "Title of the movie to delete", true),
+				"get": {
+					Summary: "Describe a Movie",
+					Tags:    []string{"Movies"},
+					Parameters: []swagger.Parameter{
+						swagger.NewStringPathParam("title", "Title of the movie to describe", true),
 					},
-                                        Responses: map[string]swagger.Response{
-                                                "200": {
-                                                        Description: "Success",
-                                                },
-                                        },
-                                },
+					Responses: map[string]swagger.Response{
+						"200": {
+							Description: "The desired movie",
+							Schema:      swagger.NewObjectSchema("Movie"),
+						},
+					},
+				},
+				"delete": {
+					Summary: "Delete a Movie",
+					Tags:    []string{"Movies"},
+					Parameters: []swagger.Parameter{
+						swagger.NewStringPathParam("title", "Title of the movie to delete", true),
+					},
+					Responses: map[string]swagger.Response{
+						"200": {
+							Description: "Success",
+						},
+					},
+				},
 			},
 		},
 	}

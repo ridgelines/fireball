@@ -65,7 +65,7 @@ func (r *BasicRouter) matchRoute(route *Route, req *http.Request) *RouteMatch {
 		return nil
 	}
 
-	pathVariables, ok := r.matchPathVariables(route, req.URL.Path)
+	pathVariables, ok := r.matchPathVariables(route, req.URL.RawPath)
 	if !ok {
 		return nil
 	}
@@ -84,7 +84,7 @@ func (r *BasicRouter) matchPathVariables(route *Route, url string) (map[string]s
 	}
 
 	if route.Path != "/" {
-		route.Path =  strings.TrimSuffix(route.Path, "/")
+		route.Path = strings.TrimSuffix(route.Path, "/")
 	}
 
 	routeSections := strings.Split(route.Path, "/")
