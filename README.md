@@ -174,7 +174,6 @@ func Index(c *fireball.Context) (fireball.Response, error) {
 Fireball has some built-in decorators:
 * [BasicAuthDecorator](https://godoc.org/github.com/zpatrick/fireball#BasicAuthDecorator) adds basic authentication using a specified username and password
 * [LogDecorator](https://godoc.org/github.com/zpatrick/fireball#LogDecorator) logs incoming requests
-* [SessionDecorator](https://godoc.org/github.com/zpatrick/fireball#SessionDecorator) manages [gorilla.Session](http://www.gorillatoolkit.org/pkg/sessions#Session) objects
 
 In addition to Decorators, the [Before](https://godoc.org/github.com/zpatrick/fireball#App) and [After](https://godoc.org/github.com/zpatrick/fireball#App) functions on the [Application](https://godoc.org/github.com/zpatrick/fireball#App) object can be used to perform logic when the request is received and after the response has been sent. 
 

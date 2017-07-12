@@ -1,10 +1,8 @@
 package fireball
 
 import (
-	"github.com/gorilla/sessions"
 	"log"
 	"net/http"
-	"time"
 )
 
 // A Decorator wraps logic around a Handler
@@ -54,34 +52,6 @@ func BasicAuthDecorator(username, password string) Decorator {
 			headers := map[string]string{"WWW-Authenticate": "Basic realm=\"Restricted\""}
 			response := NewResponse(401, []byte("401 Unauthorized\n"), headers)
 			return response, nil
-		}
-	}
-}
-
-// SessionDecorator will manage a *gorilla.Session object.
-// The session can be accessed by the "session" key in the Context.Meta field.
-//
-// Note that http://www.gorillatoolkit.org/pkg/sessions requires the use of context.ClearHandler:
-//  app := fireball.NewApp(routes)
-//  http.ListenAndServe(":8000", context.ClearHandler(app))
-func SessionDecorator(store sessions.Store, expiration time.Duration) Decorator {
-	return func(handler Handler) Handler {
-		return func(c *Context) (Response, error) {
-			session, err := store.Get(c.Request, "session")
-			if err != nil {
-				return nil, err
-			}
-
-			session.Options.MaxAge = int(expiration.Seconds())
-			c.Meta["session"] = session
-
-			response, err := handler(c)
-			var wrappedResponse ResponseFunc = func(w http.ResponseWriter, r *http.Request) {
-				session.Save(r, w)
-				response.Write(w, r)
-			}
-
-			return wrappedResponse, err
 		}
 	}
 }
