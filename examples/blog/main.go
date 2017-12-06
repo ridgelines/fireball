@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/zpatrick/fireball"
-	"github.com/zpatrick/fireball/examples/blog/controllers"
 	"log"
 	"net/http"
+
+	"github.com/zpatrick/fireball"
+	"github.com/zpatrick/fireball/examples/blog/controllers"
 )
 
 func main() {
