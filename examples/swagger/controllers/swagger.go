@@ -3,7 +3,7 @@ package controllers
 import (
 	"github.com/zpatrick/fireball"
 	"github.com/zpatrick/fireball/examples/swagger/models"
-	"github.com/zpatrick/go-plugin-swagger"
+	swagger "github.com/zpatrick/go-plugin-swagger"
 )
 
 type SwaggerController struct{}

@@ -1,9 +1,10 @@
 package controllers
 
 import (
-	"github.com/zpatrick/fireball"
 	"log"
 	"net/http"
+
+	"github.com/zpatrick/fireball"
 )
 
 func JSONErrorHandler(w http.ResponseWriter, r *http.Request, err error) {

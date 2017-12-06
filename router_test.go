@@ -1,10 +1,12 @@
 package fireball
 
 import (
+	"math/rand"
 	"net/http"
 	"net/url"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func nilHandler(*Context) (Response, error) {
@@ -124,4 +126,45 @@ func TestNilMatch(t *testing.T) {
 			t.Errorf("Error on Route '%s': Match was not nil", testCase.Route.Path)
 		}
 	}
+}
+
+func TestConcurrentAccess(t *testing.T) {
+	rand.Seed(time.Now().UnixNano())
+
+	router := NewBasicRouter([]*Route{
+		newRouteWithNilHandler("GET", "/"),
+		newRouteWithNilHandler("PUT", "/"),
+		newRouteWithNilHandler("POST", "/"),
+		newRouteWithNilHandler("DELETE", "/"),
+	})
+
+	requests := []*http.Request{
+		newRequest("GET", "/"),
+		newRequest("PUT", "/"),
+		newRequest("POST", "/"),
+		newRequest("DELETE", "/"),
+	}
+
+	numCalls := 0
+	done := make(chan bool)
+	for i := 0; i < 5; i++ {
+		go func() {
+			for {
+				select {
+				case <-done:
+					return
+				default:
+					i := rand.Int() % len(requests)
+					req := requests[i]
+					router.Match(req)
+					numCalls++
+				}
+			}
+		}()
+	}
+
+	for numCalls < 1000 {
+	}
+
+	close(done)
 }

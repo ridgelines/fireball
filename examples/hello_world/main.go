@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/zpatrick/fireball"
 	"log"
 	"net/http"
+
+	"github.com/zpatrick/fireball"
 )
 
 func index(c *fireball.Context) (fireball.Response, error) {

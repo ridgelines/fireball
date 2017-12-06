@@ -1,9 +1,10 @@
 package controllers
 
 import (
+	"time"
+
 	"github.com/zpatrick/fireball"
 	"github.com/zpatrick/fireball/examples/blog/models"
-	"time"
 )
 
 type RootController struct{}
