@@ -54,7 +54,7 @@ func (r *BasicRouter) Match(req *http.Request) (*RouteMatch, error) {
 
 	for _, route := range r.Routes {
 		if rm := r.matchRoute(route, req); rm != nil {
-			r.cache.Add(key, rm)
+			r.cache.Set(key, rm)
 			return rm, nil
 		}
 	}
