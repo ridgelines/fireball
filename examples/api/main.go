@@ -15,6 +15,7 @@ func main() {
 		fireball.LogDecorator())
 
 	app := fireball.NewApp(routes)
+	app.ErrorHandler = controllers.JSONErrorHandler
 
 	log.Println("Running on port 9090")
 	log.Fatal(http.ListenAndServe(":9090", app))
