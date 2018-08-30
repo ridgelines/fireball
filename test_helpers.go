@@ -7,7 +7,7 @@ import (
 
 )
 
-func ReadJSONResponse(t *testing.T, resp Response, v interface{}) *httptest.ResponseRecorder {
+func RecordJSONResponse(t *testing.T, resp Response, v interface{}) *httptest.ResponseRecorder {
 	recorder := httptest.NewRecorder()
 	resp.Write(recorder, nil)
 	if v != nil {
