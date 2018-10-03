@@ -11,13 +11,13 @@ The primary goal of this package is to make routing, response writing, and error
 
 ## Installation
 To install this package, run:
-```
+```bash
 go get github.com/zpatrick/fireball
 ```
 
 ## Getting Started
 The following snipped shows a simple "Hello, World" application using Fireball:
-```
+```go
 package main
 
 import (
@@ -54,13 +54,13 @@ The [HTTP Response](https://godoc.org/github.com/zpatrick/fireball#HTTPResponse)
 When the Write call is executed, the specified Body, Status, and Headers will be written to the http.ResponseWriter.
 
 Examples:
-```
+```go
 func Index(c *fireball.Context) (fireball.Response, error) {
     return fireball.NewResponse(200, []byte("Hello, World"), nil), nil
 }
 ```
 
-```
+```go
 func Index(c *fireball.Context) (fireball.Response, error) {
     html := []byte("<h1>Hello, World</h1>")
     return fireball.NewResponse(200, html, fireball.HTMLHeaders), nil
@@ -77,12 +77,12 @@ The [HTTPError](https://godoc.org/github.com/zpatrick/fireball#HTTPError) is a s
 When the Write is executed, the specified status, error, and headers will be written to the http.ResponseWriter. 
 
 Examples:
-```
+```go
 func Index(c *fireball.Context) (fireball.Response, error) {
     return nil, fmt.Errorf("an error occurred")
 }
 ```
-```
+```go
 func Index(c *fireball.Context) (fireball.Response, error) {
     if err := do(); err != nil {
         return nil, fireball.NewError(500, err, nil)
@@ -103,7 +103,7 @@ You can use `:variable` notation in the Path to match any string that doesn't co
 The variables defined in the Route's Path field can be accessed using the [Context](https://godoc.org/github.com/zpatrick/fireball#Context) object.
 
 Example:
-```
+```go
 route := &Fireball.Route{
   Path: "/users/:userID/orders/:orderID",
   Methods: fireball.Handlers{
@@ -123,7 +123,7 @@ func printUserOrder(c *fireball.Context) (fireball.Response, error) {
 ### Static Routing
 The built-in [FileServer](https://golang.org/pkg/net/http/#FileServer) can be used to serve static content.
 The follow snippet would serve files from the `static` directory:
-```
+```go
   app := fireball.NewApp(...)
   http.Handle("/", app)
 
@@ -134,7 +134,7 @@ The follow snippet would serve files from the `static` directory:
 ```
 
 If the application workspace contained:
-```
+```go
 app/
     main.go
     static/
@@ -151,7 +151,7 @@ The default root directory is `"views"`, and the default glob pattern is `"*.htm
 The name of the templates are `path/from/root/directory` + `filename`. 
 
 For example, if the filesystem contained:
-```
+```go
 views/
     index.html
     partials/
@@ -162,7 +162,7 @@ The templates names generated would be `"index.html"`, and `"partials/login.html
 The [Context](https://godoc.org/github.com/zpatrick/fireball#Context) contains a helper function, [HTML](https://godoc.org/github.com/zpatrick/fireball#Context.HTML), which renders templates as HTML.
 
 Example:
-```
+```go
 func Index(c *fireball.Context) (fireball.Response, error) {
     data := "Hello, World!"
     return c.HTML(200, "index.html", data)
